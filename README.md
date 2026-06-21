@@ -37,6 +37,18 @@
 - Spaced repetition helper.
 - Import validation schema and preview API.
 
+### Phase 3: Dashboard & Learning Path
+
+- Upgraded `/dashboard` into a real learning analytics dashboard.
+- Added progress cards, recommended lesson, skill score, weekly plan and category coverage.
+- Upgraded `/learn` into a learning hub with quick skill labs and grouped learning sections.
+- Upgraded `/paths` with path stats, language counts, average progress and filter chips.
+- Upgraded `/paths/[id]` with path summary, real lesson list, timeline and category coverage.
+- Upgraded `/lessons/[id]` with lesson step flow, objectives, vocabulary preview and quiz preview.
+- Added Phase 3 data helper in `lib/data/phase3-learning.ts`.
+- Added reusable learning components in `components/learning/*`.
+- Added API routes for dashboard learning summary, path detail and lesson detail.
+
 ## Run
 
 ```bash
@@ -92,7 +104,9 @@ npm run seed
 - `/admin/lessons`
 - `/admin/import`
 
-## Phase 2 API Routes
+## API Routes
+
+### Phase 2
 
 - `GET /api/content-categories`
 - `GET /api/learning-paths`
@@ -103,6 +117,13 @@ npm run seed
 - `GET /api/admin/import`
 - `POST /api/admin/import`
 
-## Phase 2 Docs
+### Phase 3
 
-See `docs/PHASE2_DATABASE_AND_MOCK_DATA.md`.
+- `GET /api/dashboard/learning-summary`
+- `GET /api/paths/[id]`
+- `GET /api/lessons/[id]`
+
+## Docs
+
+- `docs/PHASE2_DATABASE_AND_MOCK_DATA.md`
+- `docs/PHASE3_DASHBOARD_AND_LEARNING_PATH.md`
