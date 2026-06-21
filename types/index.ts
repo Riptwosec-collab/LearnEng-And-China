@@ -1,32 +1,51 @@
 export type TargetLanguage = "english" | "chinese";
 export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1";
-export type Skill = "vocabulary" | "speaking" | "listening" | "reading" | "writing" | "grammar";
+export type Skill = "vocabulary" | "speaking" | "listening" | "reading" | "writing" | "grammar" | "pronunciation" | "conversation";
 export type WordProgressStatus = "new" | "learning" | "remembered" | "review" | "difficult" | "mastered";
+export type PartOfSpeech = "noun" | "verb" | "adjective" | "adverb" | "phrase" | "preposition" | "conjunction" | "pronoun" | "interjection";
 
 export interface Category {
   id: string;
+  slug?: string;
   nameTh: string;
   nameEn: string;
   icon: string;
   description: string;
+  order?: number;
+  isDailyLife?: boolean;
+  parentId?: string | null;
 }
 
 export interface VocabularyItem {
   id: string;
   language: TargetLanguage;
+  languageId?: string;
   word: string;
   chineseHanzi?: string;
   pinyin?: string;
   ipa?: string;
   thaiPronunciation: string;
   thaiMeaning: string;
-  partOfSpeech: "noun" | "verb" | "adjective" | "adverb" | "phrase";
+  partOfSpeech: PartOfSpeech;
   cefrLevel: CefrLevel;
   hskLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   category: string;
+  categoryId?: string;
+  subcategory?: string;
   exampleSentence: string;
   exampleTranslationTh: string;
   dailyLifeSentence: string;
+  formalSentence?: string;
+  casualSentence?: string;
+  synonym?: string;
+  antonym?: string;
+  collocation?: string;
+  commonMistake?: string;
+  miniQuizQuestion?: string;
+  miniQuizChoices?: string[];
+  miniQuizAnswer?: string;
+  ttsText?: string;
+  audioUrl?: string;
   difficultyScore: number;
   frequencyScore: number;
   tags: string[];
@@ -45,6 +64,8 @@ export interface LearningPath {
   progress: number;
   isLocked: boolean;
   recommendedNextLesson: string;
+  order?: number;
+  isPublished?: boolean;
 }
 
 export interface DashboardStat {
