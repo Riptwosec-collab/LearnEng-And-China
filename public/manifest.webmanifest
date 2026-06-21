@@ -1,0 +1,10 @@
+{
+  "name": "LinguaQuest AI",
+  "short_name": "LinguaQuest",
+  "description": "AI language learning app for Thai learners of English and Mandarin Chinese",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#050816",
+  "theme_color": "#050816",
+  "icons": []
+}

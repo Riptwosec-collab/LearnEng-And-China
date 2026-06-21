@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum TargetLanguage {
+  english
+  chinese
+}
+
+enum CefrLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+}
+
+enum PartOfSpeech {
+  noun
+  verb
+  adjective
+  adverb
+  phrase
+}
+
+enum WordProgressStatus {
+  new
+  learning
+  remembered
+  review
+  difficult
+  mastered
+}
+
+model UserProfile {
+  id             String   @id @default(cuid())
+  authUserId     String   @unique
+  displayName    String?
+  nativeLanguage String   @default("th")
+  dailyGoalWords Int      @default(30)
+  xp             Int      @default(0)
+  streakCount    Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  vocabularyProgress UserVocabularyProgress[]
+  aiMessages         AiTutorMessage[]
+}
+
+model Category {
+  id          String   @id
+  nameTh      String
+  nameEn      String
+  icon        String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  vocabulary Vocabulary[]
+  lessons    Lesson[]
+}
+
+model Vocabulary {
+  id                   String         @id @default(cuid())
+  language             TargetLanguage
+  word                 String
+  chineseHanzi         String?
+  pinyin               String?
+  ipa                  String?
+  thaiPronunciation    String
+  thaiMeaning          String
+  partOfSpeech         PartOfSpeech
+  cefrLevel            CefrLevel
+  hskLevel             Int?
+  categoryId           String
+  subcategory          String?
+  exampleSentence      String
+  exampleTranslationTh String
+  dailyLifeSentence    String
+  formalSentence       String?
+  casualSentence       String?
+  synonym              String?
+  antonym              String?
+  collocation          String?
+  commonMistake        String?
+  miniQuizQuestion     String?
+  miniQuizChoices      String[]       @default([])
+  miniQuizAnswer       String?
+  ttsText              String?
+  audioUrl             String?
+  difficultyScore      Int            @default(50)
+  frequencyScore       Int            @default(50)
+  tags                 String[]       @default([])
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  category Category @relation(fields: [categoryId], references: [id])
+  progress UserVocabularyProgress[]
+
+  @@index([language, cefrLevel])
+  @@index([categoryId])
+  @@index([word])
+  @@unique([language, word, categoryId])
+}
+
+model UserVocabularyProgress {
+  id             String             @id @default(cuid())
+  userProfileId  String
+  vocabularyId   String
+  status         WordProgressStatus @default(new)
+  easeFactor     Float              @default(2.5)
+  intervalDays   Int                @default(0)
+  reviewCount    Int                @default(0)
+  lastReviewedAt DateTime?
+  nextReviewAt   DateTime?
+  isFavorite     Boolean            @default(false)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id])
+  vocabulary  Vocabulary  @relation(fields: [vocabularyId], references: [id])
+
+  @@unique([userProfileId, vocabularyId])
+  @@index([nextReviewAt])
+}
+
+model LearningPath {
+  id                    String         @id
+  title                 String
+  description           String
+  language              TargetLanguage?
+  level                 CefrLevel
+  lessonCount           Int            @default(0)
+  estimatedTime         String
+  skillFocus            String[]       @default([])
+  order                 Int            @default(0)
+  isPublished           Boolean        @default(false)
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  lessons Lesson[]
+}
+
+model Lesson {
+  id             String   @id @default(cuid())
+  pathId         String
+  categoryId     String?
+  title          String
+  description    String
+  level          CefrLevel
+  order          Int
+  estimatedMins  Int      @default(12)
+  isPublished    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  path      LearningPath @relation(fields: [pathId], references: [id])
+  category  Category?    @relation(fields: [categoryId], references: [id])
+  steps     LessonStep[]
+}
+
+model LessonStep {
+  id        String   @id @default(cuid())
+  lessonId  String
+  type      String
+  title     String
+  content   Json
+  order     Int
+  createdAt DateTime @default(now())
+
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+}
+
+model AiTutorMessage {
+  id            String   @id @default(cuid())
+  userProfileId String
+  role          String
+  content       String
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id])
+}
