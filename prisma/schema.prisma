@@ -27,6 +27,10 @@ enum PartOfSpeech {
   adjective
   adverb
   phrase
+  preposition
+  conjunction
+  pronoun
+  interjection
 }
 
 enum WordProgressStatus {
@@ -38,37 +42,134 @@ enum WordProgressStatus {
   mastered
 }
 
-model UserProfile {
-  id             String   @id @default(cuid())
-  authUserId     String   @unique
-  displayName    String?
-  nativeLanguage String   @default("th")
-  dailyGoalWords Int      @default(30)
-  xp             Int      @default(0)
-  streakCount    Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+enum SkillType {
+  vocabulary
+  speaking
+  listening
+  reading
+  writing
+  grammar
+  pronunciation
+  conversation
+}
 
-  vocabularyProgress UserVocabularyProgress[]
-  aiMessages         AiTutorMessage[]
+enum LessonStepType {
+  vocabulary
+  dialogue
+  listening
+  speaking
+  reading
+  writing
+  grammar
+  quiz
+  mission
+}
+
+enum ExerciseType {
+  multiple_choice
+  fill_blank
+  dictation
+  speaking
+  writing
+  matching
+  ordering
+  translation
+}
+
+model User {
+  id         String   @id @default(cuid())
+  authUserId String?  @unique
+  email      String   @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  profile    UserProfile?
+
+  @@map("users")
+}
+
+model UserProfile {
+  id                  String    @id @default(cuid())
+  userId              String?   @unique
+  displayName         String?
+  nativeLanguage      String    @default("th")
+  currentEnglishLevel CefrLevel @default(A1)
+  currentChineseLevel CefrLevel @default(A1)
+  learningGoals       String[]  @default([])
+  dailyGoalWords      Int       @default(30)
+  dailyGoalMinutes    Int       @default(15)
+  xp                  Int       @default(0)
+  level               Int       @default(1)
+  streakCount         Int       @default(0)
+  timezone            String    @default("Asia/Bangkok")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user                 User?                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vocabularyProgress   UserVocabularyProgress[]
+  reviewQueue          ReviewQueue[]
+  speakingSessions     SpeakingSession[]
+  writingSubmissions   WritingSubmission[]
+  aiMessages           AiTutorMessage[]
+  placementTestResults PlacementTestResult[]
+  streaks              Streak[]
+  dailyMissions        DailyMission[]
+
+  @@map("user_profiles")
+}
+
+model Language {
+  id          String         @id
+  code        TargetLanguage @unique
+  nameEn      String
+  nameTh      String
+  description String
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  vocabulary        Vocabulary[]
+  learningPaths     LearningPath[]
+  lessons           Lesson[]
+  readingPassages   ReadingPassage[]
+  listeningItems    ListeningItem[]
+  speakingScenarios SpeakingScenario[]
+  writingPrompts    WritingPrompt[]
+  grammarTopics     GrammarTopic[]
+
+  @@map("languages")
 }
 
 model Category {
   id          String   @id
+  slug        String   @unique
   nameTh      String
   nameEn      String
   icon        String
   description String
+  order       Int      @default(0)
+  isDailyLife Boolean  @default(true)
+  parentId    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  parent     Category?          @relation("CategoryTree", fields: [parentId], references: [id])
+  children   Category[]         @relation("CategoryTree")
   vocabulary Vocabulary[]
   lessons    Lesson[]
+  passages   ReadingPassage[]
+  listening  ListeningItem[]
+  speaking   SpeakingScenario[]
+  writing    WritingPrompt[]
+  grammar    GrammarTopic[]
+
+  @@index([parentId])
+  @@map("categories")
 }
 
 model Vocabulary {
-  id                   String         @id @default(cuid())
+  id                   String         @id
   language             TargetLanguage
+  languageId           String
   word                 String
   chineseHanzi         String?
   pinyin               String?
@@ -97,84 +198,368 @@ model Vocabulary {
   difficultyScore      Int            @default(50)
   frequencyScore       Int            @default(50)
   tags                 String[]       @default([])
+  source               String         @default("original_mock")
+  isPublished          Boolean        @default(true)
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
 
-  category Category @relation(fields: [categoryId], references: [id])
-  progress UserVocabularyProgress[]
+  languageRef Language                 @relation(fields: [languageId], references: [id])
+  category    Category                 @relation(fields: [categoryId], references: [id])
+  examples    VocabularyExample[]
+  progress    UserVocabularyProgress[]
+  reviewQueue ReviewQueue[]
 
   @@index([language, cefrLevel])
   @@index([categoryId])
   @@index([word])
   @@unique([language, word, categoryId])
+  @@map("vocabulary")
+}
+
+model VocabularyExample {
+  id            String   @id
+  vocabularyId  String
+  sentence      String
+  translationTh String
+  context       String
+  tone          String   @default("daily")
+  createdAt     DateTime @default(now())
+
+  vocabulary Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
+
+  @@index([vocabularyId])
+  @@map("vocabulary_examples")
 }
 
 model UserVocabularyProgress {
-  id             String             @id @default(cuid())
-  userProfileId  String
-  vocabularyId   String
-  status         WordProgressStatus @default(new)
-  easeFactor     Float              @default(2.5)
-  intervalDays   Int                @default(0)
-  reviewCount    Int                @default(0)
-  lastReviewedAt DateTime?
-  nextReviewAt   DateTime?
-  isFavorite     Boolean            @default(false)
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
+  id                    String             @id @default(cuid())
+  userProfileId         String
+  vocabularyId          String
+  status                WordProgressStatus @default(new)
+  easeFactor            Float              @default(2.5)
+  intervalDays          Int                @default(0)
+  reviewCount           Int                @default(0)
+  correctCount          Int                @default(0)
+  wrongCount            Int                @default(0)
+  pronunciationMistakes String[]           @default([])
+  writingMistakes       String[]           @default([])
+  lastReviewedAt        DateTime?
+  nextReviewAt          DateTime?
+  isFavorite            Boolean            @default(false)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
 
-  userProfile UserProfile @relation(fields: [userProfileId], references: [id])
-  vocabulary  Vocabulary  @relation(fields: [vocabularyId], references: [id])
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  vocabulary  Vocabulary  @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
 
   @@unique([userProfileId, vocabularyId])
   @@index([nextReviewAt])
+  @@map("user_vocabulary_progress")
 }
 
 model LearningPath {
-  id                    String         @id
-  title                 String
-  description           String
-  language              TargetLanguage?
-  level                 CefrLevel
-  lessonCount           Int            @default(0)
-  estimatedTime         String
-  skillFocus            String[]       @default([])
-  order                 Int            @default(0)
-  isPublished           Boolean        @default(false)
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
+  id            String          @id
+  title         String
+  description   String
+  languageId    String?
+  language      TargetLanguage?
+  level         CefrLevel
+  lessonCount   Int             @default(0)
+  estimatedTime String
+  skillFocus    SkillType[]      @default([])
+  order         Int             @default(0)
+  isPublished   Boolean         @default(false)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
-  lessons Lesson[]
+  languageRef Language? @relation(fields: [languageId], references: [id])
+  lessons     Lesson[]
+
+  @@index([language, level])
+  @@map("learning_paths")
 }
 
 model Lesson {
-  id             String   @id @default(cuid())
-  pathId         String
-  categoryId     String?
-  title          String
-  description    String
-  level          CefrLevel
-  order          Int
-  estimatedMins  Int      @default(12)
-  isPublished    Boolean  @default(false)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                String         @id
+  pathId            String
+  languageId        String
+  language          TargetLanguage
+  categoryId        String?
+  title             String
+  description       String
+  level             CefrLevel
+  order             Int
+  estimatedMins     Int            @default(12)
+  objectives        String[]       @default([])
+  recommendedNextId String?
+  isPublished       Boolean        @default(false)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
-  path      LearningPath @relation(fields: [pathId], references: [id])
-  category  Category?    @relation(fields: [categoryId], references: [id])
-  steps     LessonStep[]
+  path        LearningPath   @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  languageRef Language       @relation(fields: [languageId], references: [id])
+  category    Category?      @relation(fields: [categoryId], references: [id])
+  steps       LessonStep[]
+  exercises   Exercise[]
+  questions   QuizQuestion[]
+
+  @@index([pathId, order])
+  @@index([language, level])
+  @@map("lessons")
 }
 
 model LessonStep {
-  id        String   @id @default(cuid())
+  id        String         @id
   lessonId  String
-  type      String
+  type      LessonStepType
   title     String
   content   Json
   order     Int
-  createdAt DateTime @default(now())
+  createdAt DateTime       @default(now())
 
-  lesson Lesson @relation(fields: [lessonId], references: [id])
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId, order])
+  @@map("lesson_steps")
+}
+
+model Exercise {
+  id          String       @id
+  lessonId    String
+  type        ExerciseType
+  prompt      String
+  instruction String
+  answer      Json?
+  metadata    Json?
+  order       Int          @default(0)
+  createdAt   DateTime     @default(now())
+
+  lesson    Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+
+  @@index([lessonId])
+  @@map("exercises")
+}
+
+model QuizQuestion {
+  id            String          @id
+  lessonId      String?
+  exerciseId    String?
+  skill         SkillType
+  question      String
+  choices       String[]        @default([])
+  answer        String
+  explanationTh String
+  level         CefrLevel
+  language      TargetLanguage?
+  createdAt     DateTime        @default(now())
+
+  lesson   Lesson?   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  exercise Exercise? @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([lessonId])
+  @@index([skill, level])
+  @@map("quiz_questions")
+}
+
+model ReadingPassage {
+  id            String         @id
+  languageId    String
+  language      TargetLanguage
+  categoryId    String
+  title         String
+  level         CefrLevel
+  passage       String
+  translationTh String
+  summaryTh     String
+  keyVocabulary String[]       @default([])
+  questions     Json
+  estimatedMins Int            @default(8)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  languageRef Language @relation(fields: [languageId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  @@index([language, level])
+  @@map("reading_passages")
+}
+
+model ListeningItem {
+  id            String         @id
+  languageId    String
+  language      TargetLanguage
+  categoryId    String
+  title         String
+  level         CefrLevel
+  transcript    String
+  translationTh String
+  audioUrl      String?
+  speedOptions  Float[]        @default([0.75, 1, 1.25])
+  accent        String         @default("neutral")
+  questions     Json
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  languageRef Language @relation(fields: [languageId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  @@index([language, level])
+  @@map("listening_items")
+}
+
+model SpeakingScenario {
+  id            String         @id
+  languageId    String
+  language      TargetLanguage
+  categoryId    String
+  title         String
+  level         CefrLevel
+  roleUser      String
+  roleAi        String
+  situationTh   String
+  openingLine   String
+  targetPhrases String[]       @default([])
+  scoringRubric Json
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  languageRef Language          @relation(fields: [languageId], references: [id])
+  category    Category          @relation(fields: [categoryId], references: [id])
+  sessions    SpeakingSession[]
+
+  @@index([language, level])
+  @@map("speaking_scenarios")
+}
+
+model SpeakingSession {
+  id                 String   @id @default(cuid())
+  userProfileId      String
+  scenarioId         String
+  transcript         String
+  expectedText       String?
+  pronunciationScore Int      @default(0)
+  fluencyScore       Int      @default(0)
+  confidenceScore    Int      @default(0)
+  feedbackTh         String
+  mispronouncedWords String[] @default([])
+  createdAt          DateTime @default(now())
+
+  userProfile UserProfile      @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  scenario    SpeakingScenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+
+  @@index([userProfileId, createdAt])
+  @@map("speaking_sessions")
+}
+
+model WritingPrompt {
+  id             String         @id
+  languageId     String
+  language       TargetLanguage
+  categoryId     String
+  title          String
+  level          CefrLevel
+  promptTh       String
+  promptTarget   String?
+  writingType    String
+  suggestedWords String[]       @default([])
+  rubric         Json
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  languageRef Language            @relation(fields: [languageId], references: [id])
+  category    Category            @relation(fields: [categoryId], references: [id])
+  submissions WritingSubmission[]
+
+  @@index([language, level])
+  @@map("writing_prompts")
+}
+
+model WritingSubmission {
+  id               String   @id @default(cuid())
+  userProfileId    String
+  promptId         String
+  originalText     String
+  correctedText    String?
+  feedbackTh       String?
+  grammarScore     Int      @default(0)
+  vocabularyScore  Int      @default(0)
+  clarityScore     Int      @default(0)
+  naturalnessScore Int      @default(0)
+  structureScore   Int      @default(0)
+  toneScore        Int      @default(0)
+  createdAt        DateTime @default(now())
+
+  userProfile UserProfile  @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  prompt      WritingPrompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  @@index([userProfileId, createdAt])
+  @@map("writing_submissions")
+}
+
+model GrammarTopic {
+  id               String         @id
+  languageId       String
+  language         TargetLanguage
+  categoryId       String?
+  title            String
+  level            CefrLevel
+  explanationTh    String
+  pattern          String
+  examples         Json
+  realLifeScenario String
+  miniQuiz         Json
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  languageRef Language  @relation(fields: [languageId], references: [id])
+  category    Category? @relation(fields: [categoryId], references: [id])
+
+  @@index([language, level])
+  @@map("grammar_topics")
+}
+
+model ReviewQueue {
+  id            String   @id @default(cuid())
+  userProfileId String
+  vocabularyId  String
+  dueAt         DateTime
+  priority      Int      @default(50)
+  reason        String   @default("spaced_repetition")
+  createdAt     DateTime @default(now())
+
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  vocabulary  Vocabulary  @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
+
+  @@index([userProfileId, dueAt])
+  @@map("review_queue")
+}
+
+model Achievement {
+  id          String   @id
+  title       String
+  description String
+  icon        String
+  xpReward    Int      @default(0)
+  condition   Json
+  createdAt   DateTime @default(now())
+
+  @@map("achievements")
+}
+
+model Streak {
+  id            String   @id @default(cuid())
+  userProfileId String
+  date          DateTime
+  studyMinutes  Int      @default(0)
+  wordsReviewed Int      @default(0)
+  lessonsDone   Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([userProfileId, date])
+  @@map("streaks")
 }
 
 model AiTutorMessage {
@@ -185,5 +570,48 @@ model AiTutorMessage {
   metadata      Json?
   createdAt     DateTime @default(now())
 
-  userProfile UserProfile @relation(fields: [userProfileId], references: [id])
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  @@index([userProfileId, createdAt])
+  @@map("ai_tutor_messages")
+}
+
+model PlacementTestResult {
+  id                String         @id @default(cuid())
+  userProfileId     String
+  language          TargetLanguage
+  goal              String
+  vocabularyScore   Int
+  grammarScore      Int
+  readingScore      Int
+  listeningScore    Int
+  speakingScore     Int
+  recommendedLevel  CefrLevel
+  recommendedPathId String?
+  weaknessTags      String[]       @default([])
+  createdAt         DateTime       @default(now())
+
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  @@index([userProfileId, language])
+  @@map("placement_test_results")
+}
+
+model DailyMission {
+  id             String    @id @default(cuid())
+  userProfileId  String?
+  title          String
+  description    String
+  skill          SkillType
+  xpReward       Int       @default(20)
+  targetCount    Int       @default(1)
+  completedCount Int       @default(0)
+  isDone         Boolean   @default(false)
+  date           DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+
+  userProfile UserProfile? @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  @@index([userProfileId, date])
+  @@map("daily_missions")
 }
