@@ -1,17 +1,41 @@
-# LinguaQuest AI — Phase 1 Project Setup
+# LinguaQuest AI
 
 เว็บแอพเรียนภาษาอังกฤษและภาษาจีนกลางสำหรับผู้ใช้ไทย ตั้งแต่ A1-C1 พร้อมโครงสร้างต่อยอดเป็นระบบจริง: Vocabulary 10K, Speaking, Listening, Reading, Writing, Grammar, AI Tutor, Review, Dashboard, Admin CMS และ CSV/JSON Import
 
-## Tech Stack
+## Phase Status
+
+### Phase 1: Project Setup
 
 - Next.js + TypeScript + App Router
-- Tailwind CSS v4 style
+- Tailwind CSS
 - Reusable UI components inspired by shadcn/ui
 - Framer Motion
-- Supabase SSR client scaffold
-- Prisma + PostgreSQL schema scaffold
+- Supabase SSR scaffold
+- Prisma + PostgreSQL scaffold
 - PWA manifest
-- Mock data พร้อมต่อ database ใน Phase 2
+- Landing, dashboard, vocabulary, speaking, listening, reading, writing, AI Tutor, review and admin pages
+
+### Phase 2: Database & Mock Data
+
+- Expanded Prisma PostgreSQL schema for the full learning system.
+- Generated mock dataset in `lib/data/phase2-dataset.ts`.
+- 2 languages: English and Mandarin Chinese.
+- 41 daily-life categories.
+- 100 English vocabulary records.
+- 100 Chinese vocabulary records with Hanzi, Pinyin, Thai pronunciation, CEFR and HSK mapping.
+- 18 learning paths.
+- 30 lessons.
+- 270 lesson steps.
+- 30 exercises.
+- 120 quiz questions.
+- 20 speaking scenarios.
+- 20 reading passages.
+- 20 listening items.
+- 20 writing prompts.
+- 30 grammar topics.
+- Achievement and daily mission templates.
+- Spaced repetition helper.
+- Import validation schema and preview API.
 
 ## Run
 
@@ -21,15 +45,15 @@ cp .env.example .env
 npm run dev
 ```
 
-เปิดเว็บที่:
+Open:
 
 ```bash
 http://localhost:3000
 ```
 
-## Database Setup for Phase 2
+## Database Setup
 
-ตั้งค่า `DATABASE_URL` และ `DIRECT_URL` ใน `.env` แล้วรัน:
+Set `DATABASE_URL` and `DIRECT_URL` in `.env`, then run:
 
 ```bash
 npm run prisma:generate
@@ -37,9 +61,9 @@ npm run prisma:push
 npm run seed
 ```
 
-## Important Routes
+## Important Pages
 
-- `/` Landing page
+- `/`
 - `/auth/login`
 - `/auth/register`
 - `/onboarding`
@@ -68,67 +92,17 @@ npm run seed
 - `/admin/lessons`
 - `/admin/import`
 
-## Created Structure
+## Phase 2 API Routes
 
-```txt
-app/
-  api/health/route.ts
-  api/vocabulary/route.ts
-  auth/login/page.tsx
-  auth/register/page.tsx
-  dashboard/page.tsx
-  vocabulary/page.tsx
-  speaking/page.tsx
-  listening/page.tsx
-  reading/page.tsx
-  writing/page.tsx
-  ai-tutor/page.tsx
-  review/page.tsx
-  admin/*
-components/
-  ui/*
-  layout/*
-  dashboard/*
-  vocabulary/*
-lib/
-  data/*
-  supabase/*
-  ai/prompt-templates.ts
-prisma/
-  schema.prisma
-  seed.ts
-data/
-  vocabulary-template.csv
-```
+- `GET /api/content-categories`
+- `GET /api/learning-paths`
+- `GET /api/lessons`
+- `GET /api/vocabulary`
+- `GET /api/dashboard/stats`
+- `GET /api/review/daily`
+- `GET /api/admin/import`
+- `POST /api/admin/import`
 
-## Phase 1 Done
+## Phase 2 Docs
 
-- Project config
-- Theme + global CSS
-- Dark/light mode
-- Sidebar + mobile bottom nav
-- Landing page
-- Auth UI scaffold
-- Dashboard with stats, progress, missions
-- Learning path cards
-- Vocabulary mock system
-- Speaking/listening/reading/writing UI scaffold
-- AI Tutor scaffold
-- Review flashcard scaffold
-- Admin CMS scaffold
-- Prisma schema scaffold
-- Seed data scaffold
-- CSV import template
-- API mock routes
-
-## Next Phase
-
-Phase 2 ควรทำ Database & Mock Data เต็มระบบ:
-
-1. ขยาย Prisma schema ให้ครบทุก table
-2. สร้าง English vocab sample 100 คำ
-3. สร้าง Chinese vocab sample 100 คำ
-4. สร้าง lessons 30 บท
-5. สร้าง quiz 100 ข้อ
-6. ต่อ Supabase Auth จริง
-7. ต่อ Prisma query จากหน้า vocabulary/dashboard
+See `docs/PHASE2_DATABASE_AND_MOCK_DATA.md`.
