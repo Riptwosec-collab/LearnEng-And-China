@@ -1,14 +1,14 @@
-import { grammarTopics } from "./phase2-dataset";
+import { grammarTopicSeeds } from "./phase2-dataset";
 
-export const grammarRealLifeTopics = grammarTopics.map((item, index) => ({
+export const grammarRealLifeTopics = grammarTopicSeeds.map((item, index) => ({
   ...item,
   realLifeSituation: ["daily routine", "ordering food", "asking for help", "work email", "travel problem", "meeting update"][index % 6],
-  explanationTh: item.explanationTh ?? "อธิบายแบบง่ายสำหรับผู้ใช้ไทย พร้อมตัวอย่างในสถานการณ์จริง",
-  examples: [
-    { target: "I usually study after work.", th: "ฉันมักเรียนหลังเลิกงาน" },
-    { target: "Can I change my booking?", th: "ฉันขอเปลี่ยนการจองได้ไหม" },
+  explanationTh: item.explanationTh ?? "Simple explanation with real-life examples.",
+  examples: item.examples?.length ? item.examples : [
+    { target: "I usually study after work.", th: "I study after work." },
+    { target: "Can I change my booking?", th: "Ask to change a booking." },
   ],
-  miniQuiz: {
+  miniQuiz: item.miniQuiz ?? {
     question: "Choose the most natural sentence.",
     choices: ["I go usually work", "I usually go to work", "Usually I to work go"],
     answer: "I usually go to work",
@@ -20,33 +20,33 @@ export const grammarRealLifeTopics = grammarTopics.map((item, index) => ({
 }));
 
 export const aiTutorQuickPrompts = [
-  "อธิบายคำศัพท์นี้แบบ A1",
-  "สร้างประโยคตัวอย่าง 5 ประโยค",
-  "แก้ประโยคให้ natural",
-  "ซ้อม roleplay สั่งอาหาร",
-  "วิเคราะห์จุดอ่อนของฉัน",
-  "สร้าง quiz จากบทเรียนนี้",
+  "Explain this word at A1 level",
+  "Generate 5 example sentences",
+  "Make my sentence more natural",
+  "Start a food ordering roleplay",
+  "Analyze my weak points",
+  "Create a quiz from this lesson",
 ];
 
 export const aiTutorMessages = [
-  { role: "assistant", content: "สวัสดี! วันนี้อยากฝึกอังกฤษหรือจีนครับ เลือกคำศัพท์ grammar หรือ roleplay ได้เลย" },
-  { role: "user", content: "ช่วยสอนคำว่า reservation แบบใช้จริง" },
-  { role: "assistant", content: "reservation แปลว่า การจอง ใช้บ่อยกับ hotel, restaurant, flight เช่น I have a reservation under Mek." },
+  { role: "assistant", content: "Hi, choose English or Mandarin and tell me what you want to practice." },
+  { role: "user", content: "Teach me reservation in real life." },
+  { role: "assistant", content: "Reservation means a booking. Example: I have a reservation under Mek." },
 ];
 
 export const aiPromptTemplates = {
   explainVocabulary: {
-    system: "You are LinguaQuest AI Tutor for Thai learners. Explain vocabulary simply with Thai meaning, pronunciation, examples and common mistakes.",
+    system: "You are LinguaQuest AI Tutor for Thai learners. Explain vocabulary simply with meaning, pronunciation, examples and common mistakes.",
     input: { word: "string", language: "english | chinese", learnerLevel: "A1-C1" },
     outputJson: { meaningTh: "string", pronunciationGuide: "string", examples: ["string"], commonMistake: "string", practiceQuestion: "string" },
   },
   correctWriting: {
-    system: "Correct writing for Thai learners. Keep the learner voice, explain mistakes in Thai and return scores.",
+    system: "Correct writing for Thai learners. Keep the learner voice, explain mistakes and return scores.",
     input: { text: "string", targetLanguage: "english | chinese", tone: "casual | formal | work" },
     outputJson: { correctedText: "string", explanationTh: "string", scores: { grammar: 0, vocabulary: 0, clarity: 0, naturalness: 0, structure: 0, tone: 0 } },
   },
   scoreSpeaking: {
-    system: "Score a speech transcript against a target sentence. Return practical pronunciation and fluency advice in Thai.",
+    system: "Score a speech transcript against a target sentence. Return practical advice.",
     input: { targetSentence: "string", transcript: "string", language: "english | chinese" },
     outputJson: { pronunciation: 0, fluency: 0, confidence: 0, missingWords: ["string"], feedbackTh: "string" },
   },
@@ -56,7 +56,7 @@ export const aiPromptTemplates = {
     outputJson: { openingLine: "string", expectedReplies: ["string"], correctionRules: ["string"] },
   },
   recommendNextLesson: {
-    system: "Analyze learning progress and recommend the next lesson with a short reason in Thai.",
+    system: "Analyze learning progress and recommend the next lesson with a short reason.",
     input: { weakSkills: ["string"], dueWords: 0, currentLevel: "A1-C1" },
     outputJson: { lessonId: "string", reasonTh: "string", dailyMission: "string" },
   },
@@ -68,7 +68,7 @@ export function getGrammarTopic(id: string) {
 
 export function getAiTutorMockReply(message: string) {
   const lower = message.toLowerCase();
-  if (lower.includes("grammar")) return "Grammar นี้ใช้ในชีวิตจริงได้แบบนี้: เริ่มจากประโยคง่าย ๆ แล้วค่อยเพิ่มรายละเอียด เช่น time + subject + verb.";
-  if (lower.includes("จีน") || lower.includes("chinese")) return "สำหรับภาษาจีน ให้จำ Hanzi + Pinyin + tone พร้อมประโยคจริง เช่น 我想买这个。= ฉันอยากซื้ออันนี้";
-  return "ได้เลยครับ ผมจะอธิบายแบบง่าย พร้อมตัวอย่าง ประโยคธรรมชาติ และแบบฝึกหัดสั้น ๆ ให้คุณฝึกต่อทันที";
+  if (lower.includes("grammar")) return "Use the grammar in a short real-life sentence first, then add detail.";
+  if (lower.includes("chinese") || lower.includes("mandarin")) return "For Mandarin, learn Hanzi, Pinyin and tone together with one daily sentence.";
+  return "I can explain, correct, quiz or roleplay. Tell me your level and goal.";
 }
