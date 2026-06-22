@@ -23,31 +23,44 @@
 - 41 daily-life categories.
 - 100 English vocabulary records.
 - 100 Chinese vocabulary records with Hanzi, Pinyin, Thai pronunciation, CEFR and HSK mapping.
-- 18 learning paths.
-- 30 lessons.
-- 270 lesson steps.
-- 30 exercises.
-- 120 quiz questions.
-- 20 speaking scenarios.
-- 20 reading passages.
-- 20 listening items.
-- 20 writing prompts.
-- 30 grammar topics.
-- Achievement and daily mission templates.
-- Spaced repetition helper.
+- 18 learning paths, 30 lessons, 270 lesson steps, 120 quiz questions and skill-lab content.
 - Import validation schema and preview API.
 
 ### Phase 3: Dashboard & Learning Path
 
 - Upgraded `/dashboard` into a real learning analytics dashboard.
 - Added progress cards, recommended lesson, skill score, weekly plan and category coverage.
-- Upgraded `/learn` into a learning hub with quick skill labs and grouped learning sections.
-- Upgraded `/paths` with path stats, language counts, average progress and filter chips.
-- Upgraded `/paths/[id]` with path summary, real lesson list, timeline and category coverage.
-- Upgraded `/lessons/[id]` with lesson step flow, objectives, vocabulary preview and quiz preview.
-- Added Phase 3 data helper in `lib/data/phase3-learning.ts`.
+- Upgraded `/learn`, `/paths`, `/paths/[id]` and `/lessons/[id]`.
 - Added reusable learning components in `components/learning/*`.
-- Added API routes for dashboard learning summary, path detail and lesson detail.
+
+### Phase 4: Vocabulary 10K System
+
+- Added `lib/data/phase4-vocabulary.ts`.
+- Upgraded `/vocabulary`, `/vocabulary/[id]`, `/review` and `/flashcards`.
+- Added search/filter helper, word detail, learner word progress, flashcard decks and daily review queue.
+- Added review preview logic for easy/good/hard/again.
+- Added vocabulary and review API routes.
+
+### Phase 5: Speaking & Listening
+
+- Added `lib/data/phase5-speaking-listening.ts`.
+- Upgraded `/speaking`, `/speaking/roleplay` and `/listening`.
+- Added recording UI model, waveform mock, transcript scoring, roleplay scenarios, listening items, speed controls and quiz data.
+- Added speaking/listening API routes.
+
+### Phase 6: Reading & Writing
+
+- Added `lib/data/phase6-reading-writing.ts`.
+- Upgraded `/reading` and `/writing`.
+- Added reading passage model, bilingual sentence model, key vocabulary, reading quiz, writing prompts, correction mock and score rubric.
+- Added reading/writing API routes.
+
+### Phase 7: Grammar & AI Tutor
+
+- Added `lib/data/phase7-grammar-ai.ts`.
+- Upgraded `/grammar` and `/ai-tutor`.
+- Added grammar-in-real-life topics, mini quiz, speaking/writing practice, AI tutor quick prompts and OpenAI-ready prompt templates.
+- Added AI Tutor chat API mock.
 
 ## Run
 
@@ -123,7 +136,24 @@ npm run seed
 - `GET /api/paths/[id]`
 - `GET /api/lessons/[id]`
 
+### Phase 4-7
+
+- `GET /api/vocabulary/search`
+- `GET /api/vocabulary/[id]`
+- `GET /api/vocabulary/[id]/review-preview`
+- `GET /api/review/queue`
+- `GET /api/speaking/scenarios`
+- `POST /api/speaking/score`
+- `GET /api/listening/items`
+- `GET /api/reading/passages`
+- `GET /api/writing/prompts`
+- `POST /api/writing/correct`
+- `GET /api/grammar/topics`
+- `GET /api/ai-tutor/chat`
+- `POST /api/ai-tutor/chat`
+
 ## Docs
 
 - `docs/PHASE2_DATABASE_AND_MOCK_DATA.md`
 - `docs/PHASE3_DASHBOARD_AND_LEARNING_PATH.md`
+- `docs/PHASE4_TO_7_SKILL_SYSTEMS.md`
