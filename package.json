@@ -5,14 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "qa": "npm run typecheck && npm run lint && npm run build",
     "format": "prettier --write .",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "content:expand": "tsx scripts/expand-vocabulary.ts",
+    "content:export": "tsx scripts/export-vocabulary-json.ts"
   },
   "dependencies": {
     "@prisma/client": "latest",
@@ -25,6 +29,7 @@
     "lucide-react": "latest",
     "next": "latest",
     "next-themes": "latest",
+    "openai": "latest",
     "papaparse": "latest",
     "react": "latest",
     "react-dom": "latest",
@@ -33,6 +38,7 @@
     "zod": "latest"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "latest",
     "@tailwindcss/postcss": "latest",
     "@types/node": "latest",
     "@types/papaparse": "latest",
@@ -44,7 +50,6 @@
     "prisma": "latest",
     "tailwindcss": "latest",
     "tsx": "latest",
-    "typescript": "latest",
-    "@eslint/eslintrc": "latest"
+    "typescript": "latest"
   }
 }
