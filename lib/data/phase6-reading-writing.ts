@@ -1,32 +1,32 @@
-import { readingPassages, writingPrompts } from "./phase2-dataset";
+import { readingPassageSeeds, writingPromptSeeds } from "./phase2-dataset";
 
-export const readingLabItems = readingPassages.map((item, index) => ({
+export const readingLabItems = readingPassageSeeds.map((item, index) => ({
   ...item,
   readingTimeMinutes: 3 + (index % 6),
   keyVocabulary: ["reservation", "ticket", "schedule", "medicine", "transfer"].slice(0, 3 + (index % 3)),
-  summaryTh: "บทอ่านนี้ฝึกจับใจความ สถานการณ์จริง และคำศัพท์ที่ใช้บ่อยในชีวิตประจำวัน",
+  summaryTh: item.summaryTh ?? "Reading practice for daily communication.",
   comprehensionQuestions: [
     { question: "What is the main idea?", answer: "Daily-life communication" },
     { question: "Which word is useful in this situation?", answer: "The highlighted vocabulary" },
   ],
   bilingualSentences: [
-    { target: item.content.split(".")[0] || item.title, th: "แปลไทยทีละประโยคสำหรับผู้เรียนไทย" },
+    { target: item.passage.split(".")[0] || item.title, th: item.translationTh },
   ],
 }));
 
-export const writingLabPrompts = writingPrompts.map((item, index) => ({
+export const writingLabPrompts = writingPromptSeeds.map((item, index) => ({
   ...item,
   estimatedMinutes: 5 + (index % 6),
   scoreRubric: ["grammar", "vocabulary", "clarity", "naturalness", "structure", "tone"],
   sampleAnswer: index % 2 === 0 ? "Hi, I would like to reschedule our meeting to Friday afternoon. Please let me know if that works for you." : "Today I practiced new words and listened to a short conversation. I want to speak more naturally tomorrow.",
-  tipsTh: ["เขียนประโยคสั้นก่อน", "ใช้คำเชื่อมง่าย ๆ", "ตรวจ tense และ tone ก่อนส่ง"],
+  tipsTh: ["write short sentences first", "use simple connectors", "check tense and tone"],
 }));
 
 export const writingCorrectionMock = {
   before: "I want change meeting to tomorrow because I busy today.",
   after: "I would like to reschedule the meeting for tomorrow because I am busy today.",
   scores: { grammar: 72, vocabulary: 76, clarity: 80, naturalness: 74, structure: 78, tone: 82 },
-  explanationTh: "ประโยคเดิมเข้าใจได้ แต่ควรใช้ reschedule และเติม am เพื่อให้ grammar ถูกต้อง รวมถึงใช้ would like เพื่อให้สุภาพขึ้น",
+  explanationTh: "Use reschedule, add am, and choose would like for a polite tone.",
   suggestedVocabulary: ["reschedule", "available", "confirm", "convenient"],
 };
 
@@ -52,7 +52,7 @@ export function scoreWritingPreview(text: string) {
       structure: Math.min(90, base + 1),
       tone: Math.min(95, base + 4),
     },
-    explanationTh: "นี่เป็น mock correction สำหรับ Phase 6 ก่อนต่อ OpenAI API จริงใน production",
+    explanationTh: "Mock correction for Phase 6 before connecting OpenAI.",
     suggestedVocabulary: writingCorrectionMock.suggestedVocabulary,
   };
 }
