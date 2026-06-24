@@ -10,11 +10,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      DIRECT_URL: ${{ secrets.DIRECT_URL }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/linguaquest_ai?schema=public
+      DIRECT_URL: postgresql://postgres:postgres@localhost:5432/linguaquest_ai?schema=public
+      AI_PROVIDER: openai
+      OPENAI_API_KEY: ci-placeholder
       NEXT_PUBLIC_ENABLE_MOCK_AI: "true"
       NEXT_PUBLIC_ENABLE_MOCK_SPEECH: "true"
     steps:
@@ -24,7 +26,9 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - run: npm run env:check
       - run: npm run prisma:generate
+      - run: npm run content:export
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
