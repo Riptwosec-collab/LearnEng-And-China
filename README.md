@@ -1,6 +1,6 @@
 # LinguaQuest AI
 
-เว็บแอพเรียนภาษาอังกฤษและภาษาจีนกลางสำหรับผู้ใช้ไทย ตั้งแต่ A1-C1 พร้อม Vocabulary, Speaking, Listening, Reading, Writing, Grammar, AI Tutor, Review, Dashboard, Admin CMS, Supabase, OpenAI, STT/TTS, QA workflow, Vercel config และ content expansion
+เว็บแอพเรียนภาษาอังกฤษและภาษาจีนกลางสำหรับผู้ใช้ไทย ตั้งแต่ A1-C1 พร้อม Vocabulary, Speaking, Listening, Reading, Writing, Grammar, AI Tutor, Review, Dashboard, Admin CMS, Supabase, AI provider adapter, STT/TTS, QA workflow, Vercel config และ content expansion
 
 ## Phase Status
 
@@ -17,11 +17,11 @@
 - Phase 11: User Progress / Placement / Profile - Done
 - Phase 12: Launch / PWA / Beta Readiness - Done
 - Phase 13: Real Supabase Auth & Database - Done
-- Phase 14: Real OpenAI Integration - Done
+- Phase 14: Real AI Integration - Done
 - Phase 15: Real STT/TTS Speaking System - Done
 - Phase 16: Build Fix & QA - Done
-- Phase 17: Deploy to Vercel config - Done
-- Phase 18: Content Expansion 1,000+ ready - Done
+- Phase 17: Vercel deploy config - Done
+- Phase 18: Content Expansion 1,000+ / 10,000+ ready - Done
 
 ## Run
 
@@ -37,6 +37,25 @@ Open:
 http://localhost:3000
 ```
 
+## Production Setup
+
+After filling real environment values, run:
+
+```bash
+npm run env:check
+npm run prisma:generate
+npm run prisma:push
+npm run seed
+npm run content:expand
+npm run qa
+```
+
+Or run the combined setup command:
+
+```bash
+npm run setup:production
+```
+
 ## Database Setup
 
 Set database env values, then run:
@@ -45,6 +64,12 @@ Set database env values, then run:
 npm run prisma:generate
 npm run prisma:push
 npm run seed
+```
+
+See:
+
+```txt
+docs/SUPABASE_PRODUCTION_SETUP.md
 ```
 
 ## Real Integrations
@@ -57,12 +82,19 @@ npm run seed
 - `lib/db/prisma.ts`
 - `lib/auth/session.ts`
 
-### OpenAI
+### AI Provider Adapter
 
 - `lib/ai/openai.ts`
+- Supports `openai`, `openrouter`, and `gemini` through `AI_PROVIDER`
 - `POST /api/ai-tutor/chat`
 - `POST /api/writing/correct`
 - `POST /api/quiz/generate`
+
+See:
+
+```txt
+docs/AI_PROVIDER_SETUP.md
+```
 
 ### Speech
 
@@ -77,6 +109,7 @@ npm run typecheck
 npm run lint
 npm run build
 npm run qa
+npm run smoke
 ```
 
 GitHub Actions workflow:
@@ -90,13 +123,21 @@ GitHub Actions workflow:
 ```bash
 npm run content:export
 npm run content:expand
-EXPANDED_VOCAB_PER_LANGUAGE=5000 npm run content:expand
+npm run content:10k
 ```
 
 Preview API:
 
 ```txt
 GET /api/content/expanded-vocabulary
+```
+
+## Deployment
+
+See:
+
+```txt
+docs/DEPLOYMENT_RUNBOOK.md
 ```
 
 ## Important Pages
@@ -130,15 +171,3 @@ GET /api/content/expanded-vocabulary
 - `/admin/lessons`
 - `/admin/import`
 - `/admin/system`
-
-## Docs
-
-- `docs/PHASE2_DATABASE_AND_MOCK_DATA.md`
-- `docs/PHASE3_DASHBOARD_AND_LEARNING_PATH.md`
-- `docs/PHASE4_TO_7_SKILL_SYSTEMS.md`
-- `docs/PHASE8_TO_12_PLATFORM_READY.md`
-- `docs/PHASE13_TO_18_REAL_SYSTEMS.md`
-
-## Deployment
-
-The repo includes `vercel.json`. Add production env values in Vercel before deploying.
