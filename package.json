@@ -11,12 +11,16 @@
     "typecheck": "tsc --noEmit",
     "qa": "npm run typecheck && npm run lint && npm run build",
     "format": "prettier --write .",
+    "env:check": "tsx scripts/check-env.ts",
+    "setup:production": "tsx scripts/setup-production.ts",
+    "smoke": "tsx scripts/smoke-test.ts",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
     "content:expand": "tsx scripts/expand-vocabulary.ts",
-    "content:export": "tsx scripts/export-vocabulary-json.ts"
+    "content:export": "tsx scripts/export-vocabulary-json.ts",
+    "content:10k": "EXPANDED_VOCAB_PER_LANGUAGE=5000 tsx scripts/expand-vocabulary.ts"
   },
   "dependencies": {
     "@prisma/client": "latest",
