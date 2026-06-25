@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
+      - run: npm install
       - run: npm run env:check
       - run: npm run prisma:generate
       - run: npm run content:export
