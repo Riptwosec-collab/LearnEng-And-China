@@ -1,4 +1,9 @@
+import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
+
 export async function POST(request: Request) {
+  const rateLimit = checkRateLimit(`speech-tts:${getClientIp(request)}`, 15, 60_000);
+  if (!rateLimit.allowed) return rateLimitResponse(rateLimit);
+
   const apiKey = process.env.OPENAI_API_KEY;
   const mock = process.env.NEXT_PUBLIC_ENABLE_MOCK_SPEECH === "true";
   const body = await request.json().catch(() => ({}));
