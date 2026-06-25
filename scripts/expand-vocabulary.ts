@@ -4,8 +4,8 @@ import { generateExpandedVocabulary } from "../lib/data/phase18-vocabulary-expan
 async function main() {
   const target = Number(process.env.EXPANDED_VOCAB_PER_LANGUAGE ?? 500);
   const rows = generateExpandedVocabulary(target);
-  const categories = await prisma.category.findMany({ select: { id: true, slug: true } });
-  const languages = await prisma.language.findMany({ select: { id: true, code: true } });
+  const categories: { id: string; slug: string }[] = await prisma.category.findMany({ select: { id: true, slug: true } });
+  const languages: { id: string; code: string }[] = await prisma.language.findMany({ select: { id: true, code: true } });
   const categoryBySlug = new Map(categories.map((item) => [item.slug, item.id]));
   const languageByCode = new Map(languages.map((item) => [item.code, item.id]));
 
