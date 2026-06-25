@@ -9,7 +9,18 @@ async function main() {
   }
 
   for (const item of categorySeeds) {
-    await prisma.category.upsert({ where: { id: item.id }, update: item, create: item });
+    const data = {
+      id: item.id,
+      slug: item.slug,
+      nameTh: item.nameTh,
+      nameEn: item.nameEn,
+      icon: item.icon,
+      description: item.description,
+      order: item.order ?? 0,
+      isDailyLife: item.isDailyLife ?? true,
+      ...(item.parentId ? { parentId: item.parentId } : {})
+    };
+    await prisma.category.upsert({ where: { id: item.id }, update: data, create: data });
   }
 
   for (const item of learningPathSeeds) {
