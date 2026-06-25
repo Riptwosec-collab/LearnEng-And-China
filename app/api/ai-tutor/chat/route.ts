@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   const fallback = getAiTutorMockReply(message);
 
   const result = await callOpenAiJson({
-    system: aiPromptTemplates.roleplayConversation.system,
+    system: aiPromptTemplates.roleplay.system,
     user: { task: "ai_tutor_chat", language, learnerLevel, message, replyInThai: true },
     fallback: { reply: fallback, thai_hint: "โหมด mock: ใส่ OPENAI_API_KEY และปิด NEXT_PUBLIC_ENABLE_MOCK_AI เพื่อใช้ AI จริง" }
   });
