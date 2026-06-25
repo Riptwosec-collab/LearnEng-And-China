@@ -34,4 +34,257 @@ or regenerate with the same approach, whenever top-level files are added/removed
 │   │   │   └── vocabulary
 │   │   │       └── drafts
 │   │   │           └── route.ts
-│   ├── api
+│   │   ├── ai-tutor
+│   │   │   └── chat
+│   │   │       └── route.ts
+│   │   ├── auth
+│   │   │   ├── me
+│   │   │   │   └── route.ts
+│   │   │   └── profile
+│   │   │       └── route.ts
+│   │   ├── content
+│   │   │   └── expanded-vocabulary
+│   │   │       └── route.ts
+│   │   ├── content-categories
+│   │   │   └── route.ts
+│   │   ├── dashboard
+│   │   │   ├── learning-summary
+│   │   │   │   └── route.ts
+│   │   │   └── stats
+│   │   │       └── route.ts
+│   │   ├── db
+│   │   │   ├── user-progress
+│   │   │   │   └── route.ts
+│   │   │   └── vocabulary
+│   │   │       ├── progress
+│   │   │       │   └── route.ts
+│   │   │       └── route.ts
+│   │   ├── grammar
+│   │   │   └── topics
+│   │   │       └── route.ts
+│   │   ├── health
+│   │   │   └── route.ts
+│   │   ├── launch
+│   │   │   └── checklist
+│   │   │       └── route.ts
+│   │   ├── learning-paths
+│   │   │   └── route.ts
+│   │   ├── lessons
+│   │   │   ├── [id]
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   ├── listening
+│   │   │   └── items
+│   │   │       └── route.ts
+│   │   ├── paths
+│   │   │   └── [id]
+│   │   │       └── route.ts
+│   │   ├── placement
+│   │   │   └── recommendation
+│   │   │       └── route.ts
+│   │   ├── production
+│   │   │   └── checklist
+│   │   │       └── route.ts
+│   │   ├── quiz
+│   │   │   └── generate
+│   │   │       └── route.ts
+│   │   ├── reading
+│   │   │   └── passages
+│   │   │       └── route.ts
+│   │   ├── review
+│   │   │   ├── daily
+│   │   │   │   └── route.ts
+│   │   │   └── queue
+│   │   │       └── route.ts
+│   │   ├── speaking
+│   │   │   ├── scenarios
+│   │   │   │   └── route.ts
+│   │   │   └── score
+│   │   │       └── route.ts
+│   │   ├── speech
+│   │   │   ├── stt
+│   │   │   │   └── route.ts
+│   │   │   └── tts
+│   │   │       └── route.ts
+│   │   ├── user
+│   │   │   └── progress
+│   │   │       └── route.ts
+│   │   ├── vocabulary
+│   │   │   ├── [id]
+│   │   │   │   ├── review-preview
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   ├── search
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   └── writing
+│   │       ├── correct
+│   │       │   └── route.ts
+│   │       └── prompts
+│   │           └── route.ts
+│   ├── auth
+│   │   ├── callback
+│   │   │   └── route.ts
+│   │   ├── login
+│   │   │   └── page.tsx
+│   │   └── register
+│   │       └── page.tsx
+│   ├── dashboard
+│   │   └── page.tsx
+│   ├── flashcards
+│   │   └── page.tsx
+│   ├── grammar
+│   │   └── page.tsx
+│   ├── learn
+│   │   └── page.tsx
+│   ├── lessons
+│   │   └── [id]
+│   │       └── page.tsx
+│   ├── listening
+│   │   └── page.tsx
+│   ├── onboarding
+│   │   └── page.tsx
+│   ├── paths
+│   │   ├── [id]
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── placement-test
+│   │   └── page.tsx
+│   ├── profile
+│   │   └── page.tsx
+│   ├── progress
+│   │   └── page.tsx
+│   ├── reading
+│   │   └── page.tsx
+│   ├── review
+│   │   └── page.tsx
+│   ├── settings
+│   │   └── page.tsx
+│   ├── speaking
+│   │   ├── roleplay
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── vocabulary
+│   │   ├── [id]
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── writing
+│   │   └── page.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── components
+│   ├── dashboard
+│   │   ├── feature-grid.tsx
+│   │   ├── path-card.tsx
+│   │   └── stat-card.tsx
+│   ├── home
+│   │   └── hero.tsx
+│   ├── layout
+│   │   ├── app-shell.tsx
+│   │   ├── bottom-nav.tsx
+│   │   ├── page-header.tsx
+│   │   ├── sidebar.tsx
+│   │   └── topbar.tsx
+│   ├── learning
+│   │   ├── lesson-card.tsx
+│   │   ├── lesson-timeline.tsx
+│   │   ├── path-progress-panel.tsx
+│   │   ├── recommended-lesson-card.tsx
+│   │   └── skill-score-card.tsx
+│   ├── motion
+│   │   └── fade-in.tsx
+│   ├── ui
+│   │   ├── badge.tsx
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── input.tsx
+│   │   └── progress.tsx
+│   ├── vocabulary
+│   │   └── word-card.tsx
+│   └── theme-provider.tsx
+├── data
+│   └── vocabulary-template.csv
+├── docs
+│   ├── AI_PROVIDER_SETUP.md
+│   ├── DEPLOYMENT_RUNBOOK.md
+│   ├── PHASE13_TO_18_REAL_INTEGRATION.md
+│   ├── PHASE13_TO_18_REAL_SYSTEMS.md
+│   ├── PHASE2_DATABASE_AND_MOCK_DATA.md
+│   ├── PHASE3_DASHBOARD_AND_LEARNING_PATH.md
+│   ├── PHASE4_TO_7_SKILL_SYSTEMS.md
+│   ├── PHASE8_TO_12_PLATFORM_READY.md
+│   └── SUPABASE_PRODUCTION_SETUP.md
+├── lib
+│   ├── ai
+│   │   ├── openai-client.ts
+│   │   ├── openai.ts
+│   │   ├── prompt-templates.ts
+│   │   └── run-text.ts
+│   ├── auth
+│   │   ├── profile.ts
+│   │   └── session.ts
+│   ├── data
+│   │   ├── categories.ts
+│   │   ├── dashboard.ts
+│   │   ├── import-schema.ts
+│   │   ├── learning-paths.ts
+│   │   ├── phase10-production.ts
+│   │   ├── phase11-user-progress.ts
+│   │   ├── phase12-launch.ts
+│   │   ├── phase18-vocabulary-expansion.ts
+│   │   ├── phase2-dataset.ts
+│   │   ├── phase3-learning.ts
+│   │   ├── phase4-vocabulary.ts
+│   │   ├── phase5-speaking-listening.ts
+│   │   ├── phase6-reading-writing.ts
+│   │   ├── phase7-grammar-ai.ts
+│   │   ├── phase8-admin.ts
+│   │   ├── phase9-polish.ts
+│   │   ├── srs.test.ts
+│   │   ├── srs.ts
+│   │   └── vocabulary.ts
+│   ├── db
+│   │   └── prisma.ts
+│   ├── speech
+│   │   └── browser-speech.ts
+│   ├── supabase
+│   │   ├── client.ts
+│   │   ├── middleware.ts
+│   │   └── server.ts
+│   ├── env.ts
+│   ├── navigation.ts
+│   ├── prisma.ts
+│   ├── rate-limit.test.ts
+│   ├── rate-limit.ts
+│   ├── utils.test.ts
+│   └── utils.ts
+├── prisma
+│   ├── schema.prisma
+│   └── seed.ts
+├── public
+│   └── manifest.webmanifest
+├── scripts
+│   ├── check-env.ts
+│   ├── expand-vocabulary.ts
+│   ├── export-vocabulary-json.ts
+│   ├── setup-production.ts
+│   └── smoke-test.ts
+├── types
+│   └── index.ts
+├── .env.example
+├── .gitignore
+├── components.json
+├── CONTRIBUTING.md
+├── eslint.config.mjs
+├── LICENSE
+├── middleware.ts
+├── next.config.ts
+├── package-lock.json
+├── package.json
+├── postcss.config.mjs
+├── README.md
+├── SECURITY.md
+├── tsconfig.json
+├── vercel.json
+└── vitest.config.ts
