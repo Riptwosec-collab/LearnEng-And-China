@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { categorySeeds, languageSeeds, learningPathSeeds, vocabularySeeds } from "../lib/data/phase2-dataset";
 
 const prisma = new PrismaClient();
@@ -9,7 +9,7 @@ async function main() {
   }
 
   for (const item of categorySeeds) {
-    const data = {
+    const data: Prisma.CategoryUncheckedCreateInput = {
       id: item.id,
       slug: item.slug,
       nameTh: item.nameTh,
@@ -17,14 +17,22 @@ async function main() {
       icon: item.icon,
       description: item.description,
       order: item.order ?? 0,
-      isDailyLife: item.isDailyLife ?? true,
-      ...(item.parentId ? { parentId: item.parentId } : {})
+      isDailyLife: item.isDailyLife ?? true
     };
-    await prisma.category.upsert({ where: { id: item.id }, update: data, create: data });
+
+    if (item.parentId) {
+      data.parentId = item.parentId;
+    }
+
+    await prisma.category.upsert({
+      where: { id: item.id },
+      update: data,
+      create: data
+    });
   }
 
   for (const item of learningPathSeeds) {
-    const data = {
+    const data: Prisma.LearningPathUncheckedCreateInput = {
       id: item.id,
       title: item.title,
       description: item.description,
@@ -37,11 +45,16 @@ async function main() {
       order: item.order ?? 0,
       isPublished: true
     };
-    await prisma.learningPath.upsert({ where: { id: item.id }, update: data as any, create: data as any });
+
+    await prisma.learningPath.upsert({
+      where: { id: item.id },
+      update: data,
+      create: data
+    });
   }
 
   for (const item of vocabularySeeds) {
-    const data = {
+    const data: Prisma.VocabularyUncheckedCreateInput = {
       id: item.id,
       language: item.language,
       languageId: item.languageId ?? `lang-${item.language}`,
@@ -62,7 +75,12 @@ async function main() {
       frequencyScore: item.frequencyScore,
       tags: item.tags
     };
-    await prisma.vocabulary.upsert({ where: { id: item.id }, update: data as any, create: data as any });
+
+    await prisma.vocabulary.upsert({
+      where: { id: item.id },
+      update: data,
+      create: data
+    });
   }
 
   console.log("Phase 2 seed complete");
