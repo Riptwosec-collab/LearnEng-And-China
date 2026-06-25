@@ -14,4 +14,4 @@ export const mainNav = [
   { href: "/profile", label: "Profile", icon: User },
   { href: "/settings", label: "Settings", icon: Settings },
   { href: "/listening", label: "Audio", icon: Volume2 }
-];
+] as const;
