@@ -4,7 +4,7 @@ type EnvRule = {
   hint: string;
 };
 
-const provider = process.env.AI_PROVIDER ?? "openai";
+const provider = (process.env.AI_PROVIDER ?? "openai").toLowerCase();
 const mockAi = process.env.NEXT_PUBLIC_ENABLE_MOCK_AI !== "false";
 const mockSpeech = process.env.NEXT_PUBLIC_ENABLE_MOCK_SPEECH !== "false";
 
@@ -41,9 +41,19 @@ const rules: EnvRule[] = [
     hint: "Required when AI_PROVIDER=gemini and mock AI is disabled."
   },
   {
+    name: "GROQ_API_KEY",
+    requiredWhen: () => provider === "groq" && !mockAi,
+    hint: "Required when AI_PROVIDER=groq and mock AI is disabled."
+  },
+  {
     name: "OPENAI_API_KEY",
-    requiredWhen: () => !mockSpeech,
-    hint: "Speech STT/TTS currently uses OpenAI speech endpoints when mock speech is disabled."
+    requiredWhen: () => provider !== "groq" && !mockSpeech,
+    hint: "Required when mock speech is disabled and AI_PROVIDER is not groq."
+  },
+  {
+    name: "GROQ_API_KEY",
+    requiredWhen: () => provider === "groq" && !mockSpeech,
+    hint: "Required when AI_PROVIDER=groq and mock speech is disabled."
   }
 ];
 
