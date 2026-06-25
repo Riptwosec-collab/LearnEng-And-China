@@ -11,7 +11,7 @@ async function main() {
   for (const item of categorySeeds) {
     const data: Prisma.CategoryUncheckedCreateInput = {
       id: item.id,
-      slug: item.slug,
+      slug: item.slug ?? item.id,
       nameTh: item.nameTh,
       nameEn: item.nameEn,
       icon: item.icon,
