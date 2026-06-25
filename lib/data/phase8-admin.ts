@@ -15,7 +15,7 @@ export const adminModules = [
   { id: "lessons", title: "Lesson CMS", href: "/admin/lessons", description: "Manage lessons, steps, exercises and daily missions." },
   { id: "import", title: "Import Center", href: "/admin/import", description: "Preview CSV or JSON rows before saving to database." },
   { id: "system", title: "Production Console", href: "/admin/system", description: "Check environment, security, PWA and launch readiness." }
-];
+] as const;
 
 export const vocabularyDrafts = vocabularySeeds.slice(0, 12).map((word, index) => ({
   ...word,
