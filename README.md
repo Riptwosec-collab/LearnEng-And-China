@@ -1,5 +1,9 @@
 # LinguaQuest AI
 
+[![QA](https://github.com/Riptwosec-collab/LearnEng-And-China/actions/workflows/qa.yml/badge.svg)](https://github.com/Riptwosec-collab/LearnEng-And-China/actions/workflows/qa.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-339933)](./package.json)
+
 เว็บแอพเรียนภาษาอังกฤษและภาษาจีนกลางสำหรับผู้ใช้ไทย ตั้งแต่ A1-C1 พร้อม Vocabulary, Speaking, Listening, Reading, Writing, Grammar, AI Tutor, Review, Dashboard, Admin CMS, Supabase, AI provider adapter, STT/TTS, QA workflow, Vercel config และ content expansion
 
 ## Phase Status
@@ -44,7 +48,7 @@ After filling real environment values, run:
 ```bash
 npm run env:check
 npm run prisma:generate
-npm run prisma:push
+npm run prisma:migrate:deploy
 npm run seed
 npm run content:expand
 npm run qa
@@ -58,13 +62,31 @@ npm run setup:production
 
 ## Database Setup
 
-Set database env values, then run:
+For local prototyping (no migration history, fastest iteration):
 
 ```bash
 npm run prisma:generate
 npm run prisma:push
 npm run seed
 ```
+
+For real schema changes that should be tracked and deployable, create a
+migration instead:
+
+```bash
+npm run prisma:migrate:dev -- --name <short_description>
+```
+
+In production/CI, apply already-committed migrations with:
+
+```bash
+npm run prisma:migrate:deploy
+```
+
+`prisma db push` does not create migration files — it's fine for quick local
+experiments, but production schema changes should go through
+`prisma migrate dev` / `prisma migrate deploy` so they're versioned and
+reversible.
 
 See:
 
@@ -90,6 +112,11 @@ docs/SUPABASE_PRODUCTION_SETUP.md
 - `POST /api/writing/correct`
 - `POST /api/quiz/generate`
 
+All AI and speech endpoints are protected by a basic per-IP rate limiter
+(`lib/rate-limit.ts`) to avoid runaway API costs from abuse. It's in-memory
+and per-instance — for multi-instance production deployments, swap it for a
+shared store (e.g. `@upstash/ratelimit`).
+
 See:
 
 ```txt
@@ -107,10 +134,15 @@ docs/AI_PROVIDER_SETUP.md
 ```bash
 npm run typecheck
 npm run lint
+npm run test
 npm run build
 npm run qa
 npm run smoke
 ```
+
+Unit tests live next to the code they cover (`lib/**/*.test.ts`), run with
+[Vitest](https://vitest.dev). See `lib/data/srs.test.ts` for an example
+covering the spaced-repetition scheduler.
 
 GitHub Actions workflow:
 
@@ -171,3 +203,16 @@ docs/DEPLOYMENT_RUNBOOK.md
 - `/admin/lessons`
 - `/admin/import`
 - `/admin/system`
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup, the local QA checklist,
+and the database migration workflow.
+
+## Security
+
+See [SECURITY.md](./SECURITY.md) for how to report a vulnerability.
+
+## License
+
+[MIT](./LICENSE)
