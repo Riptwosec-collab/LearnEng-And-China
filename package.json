@@ -23,7 +23,7 @@
     "content:10k": "EXPANDED_VOCAB_PER_LANGUAGE=5000 tsx scripts/expand-vocabulary.ts"
   },
   "dependencies": {
-    "@prisma/client": "latest",
+    "@prisma/client": "^6.0.0",
     "@radix-ui/react-slot": "latest",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
@@ -51,7 +51,7 @@
     "eslint": "latest",
     "eslint-config-next": "latest",
     "prettier": "latest",
-    "prisma": "latest",
+    "prisma": "^6.0.0",
     "tailwindcss": "latest",
     "tsx": "latest",
     "typescript": "latest"
