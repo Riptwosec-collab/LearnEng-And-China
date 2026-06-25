@@ -7,11 +7,12 @@ type AiJsonOptions = {
   model?: string;
 };
 
-type Provider = "openai" | "openrouter" | "gemini";
+type Provider = "openai" | "openrouter" | "gemini" | "groq";
 
 function getProvider(): Provider {
   const selected = (process.env.AI_PROVIDER ?? "").toLowerCase();
-  if (selected === "openrouter" || selected === "gemini" || selected === "openai") return selected;
+  if (selected === "openrouter" || selected === "gemini" || selected === "openai" || selected === "groq") return selected;
+  if (process.env.GROQ_API_KEY) return "groq";
   if (process.env.OPENROUTER_API_KEY) return "openrouter";
   if (process.env.GEMINI_API_KEY) return "gemini";
   return "openai";
@@ -90,6 +91,32 @@ async function callOpenRouter({ system, user, fallback, model }: AiJsonOptions) 
   return parseJsonText(readChatText((await response.json()) as JsonRecord), "openrouter");
 }
 
+async function callGroq({ system, user, fallback, model }: AiJsonOptions) {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return { mode: "mock", data: fallback };
+
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: model ?? process.env.GROQ_TEXT_MODEL ?? process.env.AI_TEXT_MODEL ?? "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: `${system}\nReturn valid JSON only.` },
+        { role: "user", content: JSON.stringify(user) }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.2,
+      max_completion_tokens: 900
+    })
+  });
+
+  if (!response.ok) return { mode: "fallback", data: fallback, error: await response.text() };
+  return parseJsonText(readChatText((await response.json()) as JsonRecord), "groq");
+}
+
 async function callGemini({ system, user, fallback, model }: AiJsonOptions) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return { mode: "mock", data: fallback };
@@ -118,6 +145,7 @@ export async function callOpenAiJson(options: AiJsonOptions) {
 
   const provider = getProvider();
   if (provider === "openrouter") return callOpenRouter(options);
+  if (provider === "groq") return callGroq(options);
   if (provider === "gemini") return callGemini(options);
   return callOpenAi(options);
 }
