@@ -7,7 +7,7 @@ const mobileNav = [
   { href: "/speaking", label: "Speak", icon: Mic },
   { href: "/review", label: "Review", icon: Repeat2 },
   { href: "/ai-tutor", label: "Tutor", icon: Bot }
-];
+] as const;
 
 export function BottomNav() {
   return (
