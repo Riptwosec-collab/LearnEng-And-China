@@ -53,6 +53,8 @@ export interface VocabularyItem {
   difficultyScore: number;
   frequencyScore: number;
   tags: string[];
+  source?: string;
+  isPublished?: boolean;
   progressStatus?: WordProgressStatus;
 }
 
