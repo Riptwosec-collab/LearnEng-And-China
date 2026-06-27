@@ -4,6 +4,10 @@ export type Skill = "vocabulary" | "speaking" | "listening" | "reading" | "writi
 export type WordProgressStatus = "new" | "learning" | "remembered" | "review" | "difficult" | "mastered";
 export type PartOfSpeech = "noun" | "verb" | "adjective" | "adverb" | "phrase" | "preposition" | "conjunction" | "pronoun" | "interjection";
 
+export type QuestionType = "multiple_choice" | "fill_blank" | "dictation" | "speaking" | "writing" | "matching" | "ordering" | "translation";
+export type TestType = "placement" | "lesson_quiz" | "unit_test" | "skill_test" | "cefr_mock" | "daily_challenge" | "review_test" | "weakness_test";
+export type DifficultyBand = "easy" | "medium" | "hard";
+
 export interface Category {
   id: string;
   slug?: string;
@@ -49,6 +53,8 @@ export interface VocabularyItem {
   difficultyScore: number;
   frequencyScore: number;
   tags: string[];
+  source?: string;
+  isPublished?: boolean;
   progressStatus?: WordProgressStatus;
 }
 
@@ -82,4 +88,76 @@ export interface DailyMission {
   xp: number;
   skill: Skill;
   isDone: boolean;
+}
+
+export interface QuestionBankItem {
+  id: string;
+  language: TargetLanguage;
+  level: CefrLevel;
+  skill: Skill;
+  category: string;
+  type: QuestionType;
+  question: string;
+  choices?: string[];
+  answer: string | string[];
+  explanationTh: string;
+  difficulty: DifficultyBand;
+  tags: string[];
+  sourceLessonId?: string;
+  isPublished?: boolean;
+  createdAt: string;
+}
+
+export interface TestSection {
+  id: string;
+  title: string;
+  skill: Skill;
+  questionCount: number;
+  instructionsTh: string;
+}
+
+export interface TestDefinition {
+  id: string;
+  title: string;
+  descriptionTh: string;
+  language: TargetLanguage;
+  type: TestType;
+  level?: CefrLevel;
+  estimatedMinutes: number;
+  xpReward: number;
+  sections: TestSection[];
+  questionIds: string[];
+  tags: string[];
+  isPublished: boolean;
+}
+
+export interface TestSubmissionAnswer {
+  questionId: string;
+  answer: string | string[];
+}
+
+export interface ScoredQuestionResult {
+  questionId: string;
+  isCorrect: boolean;
+  expectedAnswer: string | string[];
+  userAnswer: string | string[];
+  explanationTh: string;
+  skill: Skill;
+  tags: string[];
+}
+
+export interface TestResult {
+  id: string;
+  testId: string;
+  score: number;
+  total: number;
+  percent: number;
+  passed: boolean;
+  recommendedLevel?: CefrLevel;
+  skillScores: Record<Skill, number>;
+  weaknessTags: string[];
+  recommendedReview: string[];
+  studyPlanTh: string[];
+  results: ScoredQuestionResult[];
+  createdAt: string;
 }

@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { categorySeeds, languageSeeds, learningPathSeeds, vocabularySeeds } from "../lib/data/phase2-dataset";
+import { categorySeeds, languageSeeds, learningPathSeeds } from "../lib/data/phase2-dataset";
+import { vocabularySeeds } from "../lib/data/vocabulary-seeds";
 
 const prisma = new PrismaClient();
 
@@ -68,22 +69,36 @@ async function main() {
       cefrLevel: item.cefrLevel,
       hskLevel: item.hskLevel,
       categoryId: item.categoryId ?? item.category,
+      subcategory: item.subcategory,
       exampleSentence: item.exampleSentence,
       exampleTranslationTh: item.exampleTranslationTh,
       dailyLifeSentence: item.dailyLifeSentence,
+      formalSentence: item.formalSentence,
+      casualSentence: item.casualSentence,
+      synonym: item.synonym,
+      antonym: item.antonym,
+      collocation: item.collocation,
+      commonMistake: item.commonMistake,
+      miniQuizQuestion: item.miniQuizQuestion,
+      miniQuizChoices: item.miniQuizChoices ?? [],
+      miniQuizAnswer: item.miniQuizAnswer,
+      ttsText: item.ttsText,
+      audioUrl: item.audioUrl,
       difficultyScore: item.difficultyScore,
       frequencyScore: item.frequencyScore,
-      tags: item.tags
+      tags: item.tags,
+      source: item.source ?? "phase2_seed",
+      isPublished: item.isPublished ?? true
     };
 
     await prisma.vocabulary.upsert({
-      where: { id: item.id },
+      where: { language_word_categoryId: { language: item.language, word: item.word, categoryId: item.categoryId ?? item.category } },
       update: data,
       create: data
     });
   }
 
-  console.log("Phase 2 seed complete");
+  console.log(`Vocabulary seed complete: ${vocabularySeeds.length} rows`);
 }
 
 main().finally(() => prisma.$disconnect());
