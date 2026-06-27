@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 
 export type UiLang = "th" | "en";
 const STORAGE_KEY = "linguaquest:ui-lang";
@@ -293,13 +293,11 @@ type Ctx = { lang: UiLang; setLang: (l: UiLang) => void; toggle: () => void; t: 
 const UiLanguageContext = createContext<Ctx | null>(null);
 
 export function UiLanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<UiLang>("th");
-  const hydrateFromStorage = useCallback(() => {
+  const [lang, setLangState] = useState<UiLang>(() => {
+    if (typeof window === "undefined") return "th";
     const s = localStorage.getItem(STORAGE_KEY);
-    if (s === "th" || s === "en") setLangState(s);
-  }, []);
-
-  useEffect(() => { hydrateFromStorage(); }, [hydrateFromStorage]);
+    return s === "th" || s === "en" ? s : "th";
+  });
   const setLang = useCallback((l: UiLang) => { setLangState(l); localStorage.setItem(STORAGE_KEY, l); }, []);
   const toggle = useCallback(() => setLang(lang === "th" ? "en" : "th"), [lang, setLang]);
   const t = useCallback((k: TranslationKey): string => translations[lang][k], [lang]);

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, BookOpen, Brain, Headphones, Mic2, PenLine, RotateCcw } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -57,23 +57,21 @@ export default function LearnPage() {
   const [status, setStatus] = useState("loading");
   const { t } = useUiLanguage();
 
-  // useCallback so the function reference is stable and can be a proper useEffect dep
-  const loadLessons = useCallback(async () => {
-    setStatus("loading");
-    try {
-      const response = await fetch("/api/lessons", { cache: "no-store" });
-      const payload = (await response.json()) as { data?: Lesson[] };
-      setLessons(payload.data ?? []);
-      setProgress(loadProgress());
-      setStatus("ready");
-    } catch {
-      setStatus("error");
-    }
-  }, []);
-
   useEffect(() => {
+    async function loadLessons() {
+      setStatus("loading");
+      try {
+        const response = await fetch("/api/lessons", { cache: "no-store" });
+        const payload = (await response.json()) as { data?: Lesson[] };
+        setLessons(payload.data ?? []);
+        setProgress(loadProgress());
+        setStatus("ready");
+      } catch {
+        setStatus("error");
+      }
+    }
     void loadLessons();
-  }, [loadLessons]);
+  }, []);
 
   const completedCount = useMemo(() => lessons.filter((lesson) => lessonPercent(lesson, progress) >= 100).length, [lessons, progress]);
   const continueLesson = useMemo(() => lessons.find((lesson) => lessonPercent(lesson, progress) < 100) ?? lessons[0], [lessons, progress]);

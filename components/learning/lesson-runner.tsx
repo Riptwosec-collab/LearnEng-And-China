@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Loader2, Volume2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,20 +77,21 @@ export function LessonRunner({ lessonId }: { lessonId: string }) {
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [status, setStatus] = useState("loading");
 
-  const loadLesson = useCallback(async () => {
-    setStatus("loading");
-    try {
-      const response = await fetch(`/api/lessons/${lessonId}`, { cache: "no-store" });
-      const payload = (await response.json()) as { data?: LessonPayload };
-      setData(payload.data ?? null);
-      setCompletedSteps(readAllProgress()[lessonId]?.completedSteps ?? []);
-      setStatus(response.ok ? "ready" : "not_found");
-    } catch {
-      setStatus("error");
+  useEffect(() => {
+    async function loadLesson() {
+      setStatus("loading");
+      try {
+        const response = await fetch(`/api/lessons/${lessonId}`, { cache: "no-store" });
+        const payload = (await response.json()) as { data?: LessonPayload };
+        setData(payload.data ?? null);
+        setCompletedSteps(readAllProgress()[lessonId]?.completedSteps ?? []);
+        setStatus(response.ok ? "ready" : "not_found");
+      } catch {
+        setStatus("error");
+      }
     }
+    void loadLesson();
   }, [lessonId]);
-
-  useEffect(() => { void loadLesson(); }, [loadLesson]);
 
   const lesson = data?.lesson;
   const steps = useMemo(() => lesson?.steps ?? [], [lesson]);
