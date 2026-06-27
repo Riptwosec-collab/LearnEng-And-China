@@ -22,6 +22,7 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
+    "content:validate-600": "tsx scripts/validate-vocabulary-600.ts",
     "content:expand": "tsx scripts/expand-vocabulary.ts",
     "content:export": "tsx scripts/export-vocabulary-json.ts",
     "content:10k": "EXPANDED_VOCAB_PER_LANGUAGE=5000 tsx scripts/expand-vocabulary.ts"
