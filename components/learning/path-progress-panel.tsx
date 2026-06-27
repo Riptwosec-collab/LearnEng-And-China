@@ -5,7 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
-export function PathProgressPanel({ path, summary }: { path: any; summary: any }) {
+type LearningPath = {
+  language: string;
+  level?: string;
+  estimatedTime?: string;
+  title: string;
+  description?: string;
+};
+
+type PathSummary = {
+  nextLessonId: string;
+  completedLessons: number;
+  totalLessons: number;
+  progress: number;
+  estimatedMinsToday?: number;
+};
+
+export function PathProgressPanel({ path, summary }: { path: LearningPath; summary: PathSummary }) {
   return (
     <Card className="p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -19,7 +35,7 @@ export function PathProgressPanel({ path, summary }: { path: any; summary: any }
           <p className="mt-2 max-w-3xl text-muted-foreground">{path.description}</p>
         </div>
         <Button asChild>
-          <Link href={`/lessons/${summary.nextLessonId}` as never}>เรียนบทถัดไป <ArrowRight className="size-4" /></Link>
+          <Link href={`/lessons/${summary.nextLessonId}`}>เรียนบทถัดไป <ArrowRight className="size-4" /></Link>
         </Button>
       </div>
 

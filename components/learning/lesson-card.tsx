@@ -5,6 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
+type LessonStatus = "completed" | "in_progress" | "ready" | "locked";
+
+type Lesson = {
+  id: string;
+  title: string;
+  description?: string;
+  level?: string;
+  status: LessonStatus;
+  isRecommended?: boolean;
+  estimatedMins?: number;
+  steps?: unknown[];
+  xpReward?: number;
+  progress?: number;
+};
+
 const statusMap = {
   completed: { label: "เรียนแล้ว", icon: CheckCircle2, badge: "success" as const },
   in_progress: { label: "กำลังเรียน", icon: PlayCircle, badge: "default" as const },
@@ -12,8 +27,8 @@ const statusMap = {
   locked: { label: "ยังล็อก", icon: Lock, badge: "outline" as const }
 };
 
-export function LessonCard({ lesson }: { lesson: any }) {
-  const status = statusMap[lesson.status as keyof typeof statusMap] ?? statusMap.ready;
+export function LessonCard({ lesson }: { lesson: Lesson }) {
+  const status = statusMap[lesson.status] ?? statusMap.ready;
   const Icon = status.icon;
   const disabled = lesson.status === "locked";
 
@@ -49,7 +64,7 @@ export function LessonCard({ lesson }: { lesson: any }) {
       </div>
 
       <Button asChild className="mt-5 w-full" variant={disabled ? "outline" : "default"}>
-        <Link href={disabled ? "#" : (`/lessons/${lesson.id}` as never)}>{disabled ? "ปลดล็อกหลังจบบทก่อนหน้า" : "เปิดบทเรียน"}</Link>
+        <Link href={disabled ? "#" : `/lessons/${lesson.id}`}>{disabled ? "ปลดล็อกหลังจบบทก่อนหน้า" : "เปิดบทเรียน"}</Link>
       </Button>
     </Card>
   );

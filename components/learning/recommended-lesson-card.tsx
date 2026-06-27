@@ -4,7 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-export function RecommendedLessonCard({ lesson }: { lesson: any }) {
+type RecommendedLesson = {
+  id: string;
+  title: string;
+  pathTitle?: string;
+  level?: string;
+  estimatedMins?: number;
+  xpReward?: number;
+};
+
+export function RecommendedLessonCard({ lesson }: { lesson: RecommendedLesson }) {
   return (
     <Card className="p-5">
       <div className="flex items-start justify-between gap-4">
@@ -21,7 +30,7 @@ export function RecommendedLessonCard({ lesson }: { lesson: any }) {
         <div className="rounded-2xl bg-secondary/40 p-3"><b className="block text-foreground">{lesson.xpReward}</b>XP</div>
       </div>
       <Button asChild className="mt-5 w-full" variant="glass">
-        <Link href={`/lessons/${lesson.id}` as never}>เรียนต่อ <ArrowRight className="size-4" /></Link>
+        <Link href={`/lessons/${lesson.id}`}>เรียนต่อ <ArrowRight className="size-4" /></Link>
       </Button>
     </Card>
   );
