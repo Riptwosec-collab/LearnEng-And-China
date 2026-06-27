@@ -294,10 +294,12 @@ const UiLanguageContext = createContext<Ctx | null>(null);
 
 export function UiLanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<UiLang>("th");
-  useEffect(() => {
+  const hydrateFromStorage = useCallback(() => {
     const s = localStorage.getItem(STORAGE_KEY);
     if (s === "th" || s === "en") setLangState(s);
   }, []);
+
+  useEffect(() => { hydrateFromStorage(); }, [hydrateFromStorage]);
   const setLang = useCallback((l: UiLang) => { setLangState(l); localStorage.setItem(STORAGE_KEY, l); }, []);
   const toggle = useCallback(() => setLang(lang === "th" ? "en" : "th"), [lang, setLang]);
   const t = useCallback((k: TranslationKey): string => translations[lang][k], [lang]);
