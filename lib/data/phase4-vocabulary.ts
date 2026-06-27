@@ -1,4 +1,5 @@
-import { categorySeeds, vocabularySeeds } from "./phase2-dataset";
+import { categorySeeds } from "./phase2-dataset";
+import { vocabularySamples as vocabularySeeds } from "./vocabulary";
 import type { CefrLevel, TargetLanguage, VocabularyItem, WordProgressStatus } from "@/types";
 
 export type VocabularySearchInput = {
