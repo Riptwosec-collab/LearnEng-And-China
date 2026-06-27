@@ -1,6 +1,6 @@
 import { categorySeeds } from "../lib/data/phase2-dataset";
 import { englishVocabulary600 } from "../lib/data/vocabulary-english-600-pack";
-import { chineseVocabulary600 } from "../lib/data/vocabulary-chinese-600";
+import { chineseVocabulary600 } from "../lib/data/vocabulary-chinese-600-pack";
 import type { VocabularyItem } from "../types";
 
 const validCefr = new Set(["A1", "A2", "B1", "B2", "C1"]);
