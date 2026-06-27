@@ -1,8 +1,9 @@
-import { BookOpen, Bot, Gauge, Headphones, Home, Mic, PenLine, Repeat2, ScrollText, Settings, User, Volume2 } from "lucide-react";
+import { BookOpen, Bot, ClipboardCheck, Gauge, Headphones, Home, Mic, PenLine, Repeat2, ScrollText, Settings, User, Volume2 } from "lucide-react";
 
 export const mainNav = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/learn", label: "Learn", icon: BookOpen },
+  { href: "/tests", label: "Tests", icon: ClipboardCheck },
   { href: "/vocabulary", label: "Vocabulary", icon: ScrollText },
   { href: "/speaking", label: "Speaking", icon: Mic },
   { href: "/listening", label: "Listening", icon: Headphones },
