@@ -1,4 +1,5 @@
-import { categorySeeds, vocabularySeeds } from "./phase2-dataset";
+import { categorySeeds } from "./phase2-dataset";
+import { vocabularySeeds } from "./vocabulary-seeds";
 import type { CefrLevel, TargetLanguage, VocabularyItem, WordProgressStatus } from "@/types";
 
 export type VocabularySearchInput = {
@@ -7,6 +8,9 @@ export type VocabularySearchInput = {
   level?: CefrLevel | "all";
   category?: string | "all";
   status?: WordProgressStatus | "all";
+  source?: string | "all";
+  hskLevel?: number | "all";
+  partOfSpeech?: string | "all";
   limit?: number;
 };
 
@@ -35,6 +39,9 @@ export const vocabularyStats = {
   totalWords: vocabularySeeds.length,
   englishWords: vocabularySeeds.filter((word) => word.language === "english").length,
   chineseWords: vocabularySeeds.filter((word) => word.language === "chinese").length,
+  generatedEnglish600: vocabularySeeds.filter((word) => word.source === "generated_english_600").length,
+  generatedChinese600: vocabularySeeds.filter((word) => word.source === "generated_chinese_600").length,
+  latestGenerated: vocabularySeeds.filter((word) => word.source === "generated_english_600" || word.source === "generated_chinese_600").slice(-12),
   dueToday: learnerWordProgress.filter((item) => new Date(item.nextReviewAt) <= baseDate).length,
   favorites: learnerWordProgress.filter((item) => item.favorite).length,
   mastered: learnerWordProgress.filter((item) => item.status === "mastered").length,
@@ -43,7 +50,10 @@ export const vocabularyStats = {
 export const vocabularyFilters = {
   languages: ["all", "english", "chinese"] as const,
   levels: ["all", "A1", "A2", "B1", "B2", "C1"] as const,
+  hskLevels: ["all", 1, 2, 3, 4, 5] as const,
   statuses: ["all", ...statusCycle] as const,
+  sources: ["all", "generated_english_600", "generated_chinese_600", "phase2_seed"] as const,
+  partOfSpeech: ["all", "noun", "verb", "adjective", "adverb", "phrase"] as const,
   categories: ["all", ...categorySeeds.map((item) => item.id)],
 };
 
@@ -60,11 +70,14 @@ export function searchVocabulary(input: VocabularySearchInput = {}) {
     .map(withProgress)
     .filter((word) => input.language && input.language !== "all" ? word.language === input.language : true)
     .filter((word) => input.level && input.level !== "all" ? word.cefrLevel === input.level : true)
+    .filter((word) => input.hskLevel && input.hskLevel !== "all" ? word.hskLevel === input.hskLevel : true)
     .filter((word) => input.category && input.category !== "all" ? word.category === input.category || word.categoryId === input.category : true)
+    .filter((word) => input.source && input.source !== "all" ? word.source === input.source : true)
+    .filter((word) => input.partOfSpeech && input.partOfSpeech !== "all" ? word.partOfSpeech === input.partOfSpeech : true)
     .filter((word) => input.status && input.status !== "all" ? word.progressStatus === input.status : true)
     .filter((word) => {
       if (!query) return true;
-      return [word.word, word.chineseHanzi, word.pinyin, word.ipa, word.thaiMeaning, word.thaiPronunciation, word.exampleSentence]
+      return [word.word, word.chineseHanzi, word.pinyin, word.ipa, word.thaiMeaning, word.thaiPronunciation, word.exampleSentence, word.source]
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query));
     })
@@ -96,6 +109,8 @@ export function previewNextReview(status: WordProgressStatus, quality: "again" |
 
 export const flashcardDecks = [
   { id: "due-today", title: "Due Today", description: "คำที่ถึงเวลาทบทวนวันนี้", count: vocabularyStats.dueToday, mode: "srs" },
+  { id: "english-600", title: "English 600 Essential Words", description: "คำอังกฤษใหม่ครบหลายหมวด พร้อม mini quiz", count: vocabularyStats.generatedEnglish600, mode: "pack" },
+  { id: "chinese-600", title: "Chinese 600 Essential Words", description: "คำจีน HSK 1-5 พร้อม pinyin และคำอ่านไทย", count: vocabularyStats.generatedChinese600, mode: "pack" },
   { id: "difficult", title: "Difficult Words", description: "คำที่ลืมบ่อยหรือออกเสียงผิดบ่อย", count: learnerWordProgress.filter((item) => item.status === "difficult").length, mode: "focused" },
   { id: "favorites", title: "Favorites", description: "คำที่บันทึกไว้ใช้จริง", count: vocabularyStats.favorites, mode: "saved" },
   { id: "chinese-tones", title: "Chinese Tone Drill", description: "ฝึก pinyin และ tone จากคำจีน", count: vocabularyStats.chineseWords, mode: "tone" },
