@@ -1,6 +1,6 @@
 import { vocabularySeeds as baseVocabularySeeds } from "./phase2-dataset";
 import { englishVocabulary600, englishVocabulary600Summary } from "./vocabulary-english-600-pack";
-import { chineseVocabulary600, chineseVocabulary600Summary } from "./vocabulary-chinese-600";
+import { chineseVocabulary600, chineseVocabulary600Summary } from "./vocabulary-chinese-600-pack";
 import type { VocabularyItem } from "@/types";
 
 function dedupeVocabulary(rows: VocabularyItem[]) {
