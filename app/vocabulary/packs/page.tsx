@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Download, Play, RotateCcw, Sparkles } from "lucide-react";
+import { Play, RotateCcw, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ const packs = [
     href: "/vocabulary?source=generated_english_600",
     quizHref: "/tests",
     source: "generated_english_600",
+    exportFile: "data/generated/vocabulary-english-600.json",
     progress: 0
   },
   {
@@ -29,6 +30,7 @@ const packs = [
     href: "/vocabulary?source=generated_chinese_600",
     quizHref: "/tests",
     source: "generated_chinese_600",
+    exportFile: "data/generated/vocabulary-chinese-600.json",
     progress: 0
   }
 ];
@@ -56,7 +58,7 @@ export default function VocabularyPacksPage() {
               <Button asChild><Link href={pack.href}><Play className="size-4" /> เริ่มเรียน</Link></Button>
               <Button asChild variant="outline"><Link href="/review"><RotateCcw className="size-4" /> ทบทวน</Link></Button>
               <Button asChild variant="outline"><Link href={pack.quizHref}>Quiz</Link></Button>
-              <Button asChild variant="glass"><Link href="/api/content/expanded-vocabulary"><Download className="size-4" /> Export</Link></Button>
+              <div className="rounded-2xl border border-border bg-secondary/30 px-4 py-3 text-xs text-muted-foreground">Export: <code className="text-cyan-300">{pack.exportFile}</code></div>
             </div>
           </Card>
         ))}
