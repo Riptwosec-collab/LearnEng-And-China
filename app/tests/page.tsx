@@ -1,9 +1,7 @@
-import Link from "next/link";
-import { ArrowRight, ClipboardCheck, Flame, Languages, Trophy } from "lucide-react";
+import { ClipboardCheck, Flame, Languages, Trophy } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { getTestCenterSummary, getTests } from "@/lib/data/test-center";
@@ -36,22 +34,30 @@ export default function TestsPage() {
       <div className="space-y-8">
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <Card className="p-5">
-            <span className="rounded-2xl bg-cyan-400/10 p-3 text-cyan-300"><ClipboardCheck className="size-5" /></span>
+            <span className="rounded-2xl bg-cyan-400/10 p-3 text-cyan-300">
+              <ClipboardCheck className="size-5" />
+            </span>
             <p className="mt-4 text-sm text-muted-foreground">Published tests</p>
             <p className="mt-1 text-3xl font-black">{summary.totalTests}</p>
           </Card>
           <Card className="p-5">
-            <span className="rounded-2xl bg-violet-400/10 p-3 text-violet-300"><Languages className="size-5" /></span>
+            <span className="rounded-2xl bg-violet-400/10 p-3 text-violet-300">
+              <Languages className="size-5" />
+            </span>
             <p className="mt-4 text-sm text-muted-foreground">English questions</p>
             <p className="mt-1 text-3xl font-black">{summary.englishQuestions}</p>
           </Card>
           <Card className="p-5">
-            <span className="rounded-2xl bg-amber-400/10 p-3 text-amber-300"><Trophy className="size-5" /></span>
+            <span className="rounded-2xl bg-amber-400/10 p-3 text-amber-300">
+              <Trophy className="size-5" />
+            </span>
             <p className="mt-4 text-sm text-muted-foreground">Chinese safe seed</p>
             <p className="mt-1 text-3xl font-black">{summary.chineseQuestions}</p>
           </Card>
           <Card className="p-5">
-            <span className="rounded-2xl bg-emerald-400/10 p-3 text-emerald-300"><Flame className="size-5" /></span>
+            <span className="rounded-2xl bg-emerald-400/10 p-3 text-emerald-300">
+              <Flame className="size-5" />
+            </span>
             <p className="mt-4 text-sm text-muted-foreground">Skills covered</p>
             <p className="mt-1 text-3xl font-black">{summary.skillsCovered.length}</p>
           </Card>
@@ -62,14 +68,19 @@ export default function TestsPage() {
             <div>
               <Badge variant="success">Recommended first</Badge>
               <h2 className="mt-3 text-2xl font-black">เริ่มด้วย English Placement Test</h2>
-              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">วัดระดับ CEFR, สรุป skill score, weakness tags และสร้าง study plan ภาษาไทย 7 วันแรก</p>
+              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                วัดระดับ CEFR, สรุป skill score, weakness tags และสร้าง study plan ภาษาไทย 7 วันแรก
+              </p>
             </div>
-            <Button asChild>
-              <Link href="/api/tests/start?testId=placement-english-core">Preview API <ArrowRight className="size-4" /></Link>
-            </Button>
+            <div className="rounded-2xl border border-border bg-secondary/30 px-4 py-3 text-sm text-muted-foreground">
+              API preview: <code className="text-cyan-300">GET /api/tests/start?testId=placement-english-core</code>
+            </div>
           </div>
           <div className="mt-5">
-            <div className="mb-2 flex justify-between text-sm text-muted-foreground"><span>Phase 1 readiness</span><span>35%</span></div>
+            <div className="mb-2 flex justify-between text-sm text-muted-foreground">
+              <span>Phase 1 readiness</span>
+              <span>35%</span>
+            </div>
             <Progress value={35} />
           </div>
         </Card>
@@ -93,9 +104,15 @@ export default function TestsPage() {
                 <h3 className="mt-4 text-xl font-black">{test.title}</h3>
                 <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{test.descriptionTh}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {test.sections.map((section) => <Badge key={section.id} variant="outline">{section.title}</Badge>)}
+                  {test.sections.map((section) => (
+                    <Badge key={section.id} variant="outline">
+                      {section.title}
+                    </Badge>
+                  ))}
                 </div>
-                <div className="mt-4 text-sm text-muted-foreground">~{test.estimatedMinutes} นาที · {test.questionIds.length} questions</div>
+                <div className="mt-4 text-sm text-muted-foreground">
+                  ~{test.estimatedMinutes} นาที · {test.questionIds.length} questions
+                </div>
               </Card>
             ))}
           </div>
