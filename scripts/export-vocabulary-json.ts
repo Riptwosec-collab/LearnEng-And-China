@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { expandedVocabulary1000 } from "../lib/data/phase18-vocabulary-expansion";
-import { chineseVocabulary600 } from "../lib/data/vocabulary-chinese-600";
+import { chineseVocabulary600 } from "../lib/data/vocabulary-chinese-600-pack";
 import { englishVocabulary600 } from "../lib/data/vocabulary-english-600-pack";
 import { generatedVocabulary1200, generatedVocabularySummary } from "../lib/data/vocabulary-seeds";
 
