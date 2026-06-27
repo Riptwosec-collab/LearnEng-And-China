@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Sans_Thai } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { UiLanguageProvider } from "@/lib/ui-language";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const notoThai = Noto_Sans_Thai({ subsets: ["thai"], variable: "--font-thai" });
@@ -23,7 +24,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="th" suppressHydrationWarning>
       <body className={`${inter.variable} ${notoThai.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
+          <UiLanguageProvider>
+            {children}
+          </UiLanguageProvider>
         </ThemeProvider>
       </body>
     </html>
