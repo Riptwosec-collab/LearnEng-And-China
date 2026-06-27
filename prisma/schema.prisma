@@ -76,12 +76,18 @@ enum ExerciseType {
   translation
 }
 
+enum LessonProgressStatus {
+  not_started
+  in_progress
+  completed
+}
+
 model User {
-  id         String   @id @default(cuid())
-  authUserId String?  @unique
-  email      String   @unique
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id         String      @id @default(cuid())
+  authUserId String?     @unique
+  email      String      @unique
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
   profile    UserProfile?
 
   @@map("users")
@@ -113,6 +119,8 @@ model UserProfile {
   placementTestResults PlacementTestResult[]
   streaks              Streak[]
   dailyMissions        DailyMission[]
+  achievements         UserAchievement[]
+  lessonProgress       UserLessonProgress[]
 
   @@map("user_profiles")
 }
@@ -266,14 +274,15 @@ model LearningPath {
   level         CefrLevel
   lessonCount   Int             @default(0)
   estimatedTime String
-  skillFocus    SkillType[]      @default([])
+  skillFocus    SkillType[]     @default([])
   order         Int             @default(0)
   isPublished   Boolean         @default(false)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
-  languageRef Language? @relation(fields: [languageId], references: [id])
-  lessons     Lesson[]
+  languageRef      Language?             @relation(fields: [languageId], references: [id])
+  lessons          Lesson[]
+  placementResults PlacementTestResult[]
 
   @@index([language, level])
   @@map("learning_paths")
@@ -296,12 +305,13 @@ model Lesson {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
 
-  path        LearningPath   @relation(fields: [pathId], references: [id], onDelete: Cascade)
-  languageRef Language       @relation(fields: [languageId], references: [id])
-  category    Category?      @relation(fields: [categoryId], references: [id])
-  steps       LessonStep[]
-  exercises   Exercise[]
-  questions   QuizQuestion[]
+  path         LearningPath         @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  languageRef  Language             @relation(fields: [languageId], references: [id])
+  category     Category?            @relation(fields: [categoryId], references: [id])
+  steps        LessonStep[]
+  exercises    Exercise[]
+  questions    QuizQuestion[]
+  userProgress UserLessonProgress[]
 
   @@index([pathId, order])
   @@index([language, level])
@@ -490,7 +500,7 @@ model WritingSubmission {
   toneScore        Int      @default(0)
   createdAt        DateTime @default(now())
 
-  userProfile UserProfile  @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  userProfile UserProfile   @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
   prompt      WritingPrompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
 
   @@index([userProfileId, createdAt])
@@ -544,7 +554,24 @@ model Achievement {
   condition   Json
   createdAt   DateTime @default(now())
 
+  userAchievements UserAchievement[]
+
   @@map("achievements")
+}
+
+// join table — user unlocked achievement
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userProfileId String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userProfileId, achievementId])
+  @@index([userProfileId])
+  @@map("user_achievements")
 }
 
 model Streak {
@@ -591,7 +618,8 @@ model PlacementTestResult {
   weaknessTags      String[]       @default([])
   createdAt         DateTime       @default(now())
 
-  userProfile UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  userProfile     UserProfile   @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  recommendedPath LearningPath? @relation(fields: [recommendedPathId], references: [id], onDelete: SetNull)
 
   @@index([userProfileId, language])
   @@map("placement_test_results")
@@ -614,4 +642,27 @@ model DailyMission {
 
   @@index([userProfileId, date])
   @@map("daily_missions")
+}
+
+// track lesson progress per user
+model UserLessonProgress {
+  id             String               @id @default(cuid())
+  userProfileId  String
+  lessonId       String
+  status         LessonProgressStatus @default(not_started)
+  score          Int                  @default(0)
+  stepsCompleted Int                  @default(0)
+  totalSteps     Int                  @default(0)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  userProfile UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  lesson      Lesson      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userProfileId, lessonId])
+  @@index([userProfileId, status])
+  @@index([lessonId])
+  @@map("user_lesson_progress")
 }
