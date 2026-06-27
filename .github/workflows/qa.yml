@@ -28,6 +28,7 @@ jobs:
       - run: npm install
       - run: npm run env:check
       - run: npm run prisma:generate
+      - run: npm run content:validate-600
       - run: npm run content:export
       - run: npm run typecheck
       - run: npm run lint
