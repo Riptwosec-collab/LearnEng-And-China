@@ -1,133 +1,309 @@
 "use client";
-
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type UiLang = "th" | "en";
-
 const STORAGE_KEY = "linguaquest:ui-lang";
 
-// ─── Translations ─────────────────────────────────────────────────────────────
 const translations = {
   th: {
-    // Nav
-    home: "หน้าหลัก",
-    learn: "เรียน",
-    vocabulary: "คำศัพท์",
-    speaking: "พูด",
-    listening: "ฟัง",
-    reading: "อ่าน",
-    writing: "เขียน",
-    aiTutor: "AI Tutor",
-    review: "ทบทวน",
-    progress: "ความก้าวหน้า",
-    profile: "โปรไฟล์",
-    settings: "ตั้งค่า",
-    // Common UI
-    start: "เริ่มเรียน",
-    continue: "เรียนต่อ",
-    completed: "เสร็จแล้ว",
-    loading: "กำลังโหลด...",
-    error: "เกิดข้อผิดพลาด",
-    refresh: "รีเฟรช",
-    search: "ค้นหาคำศัพท์ บทเรียน grammar หรือถาม AI...",
-    lessons: "บทเรียน",
-    words: "คำศัพท์",
-    score: "คะแนน",
-    level: "ระดับ",
-    // Dashboard
-    todayGoal: "เป้าหมายวันนี้",
-    streak: "streak วัน",
-    xp: "XP",
-    // Placement
+    // ── App ──────────────────────────────────────────────────────────────
+    appSubtitle: "AI Language Lab",
+    searchPlaceholder: "ค้นหาคำศัพท์ บทเรียน grammar หรือถาม AI...",
+    // ── Sidebar nav ──────────────────────────────────────────────────────
+    navHome: "หน้าหลัก", navLearn: "เรียน", navVocabulary: "คำศัพท์",
+    navSpeaking: "พูด", navListening: "ฟัง", navReading: "อ่าน",
+    navWriting: "เขียน", navAiTutor: "AI Tutor", navReview: "ทบทวน",
+    navProgress: "ความก้าวหน้า", navProfile: "โปรไฟล์", navSettings: "ตั้งค่า",
+    // ── Bottom nav ───────────────────────────────────────────────────────
+    mobileHome: "หน้าหลัก", mobileWords: "คำศัพท์", mobileSpeak: "พูด",
+    mobileReview: "ทบทวน", mobileTutor: "Tutor",
+    // ── Landing / Hero ───────────────────────────────────────────────────
+    landingBadge: "English + ภาษาจีนกลาง · A1-C1 · สำหรับผู้ใช้ไทย",
+    landingHeadline: "เรียนภาษาให้ใช้ได้จริงด้วย",
+    landingDesc: "ฝึกฟัง พูด อ่าน เขียน คำศัพท์ Grammar และสนทนากับ AI Tutor ผ่านสถานการณ์ชีวิตจริง เช่น ร้านอาหาร เดินทาง ที่ทำงาน โรงพยาบาล และฉุกเฉิน",
+    landingCtaStart: "เริ่มเรียนเลย", landingCtaPlacement: "ทำ Placement Test",
+    landingCategoriesBadge: "Real-life categories",
+    landingCategoriesTitle: "หมวดชีวิตประจำวันที่ต้องใช้จริง",
+    heroMissionLabel: "Today Mission", heroMissionTitle: "Restaurant Roleplay",
+    heroF1Title: "Vocabulary 10K", heroF1Body: "ศัพท์อังกฤษ/จีน พร้อมคำอ่านไทย",
+    heroF2Title: "Speaking Score", heroF2Body: "AI ตรวจ pronunciation + fluency",
+    heroF3Title: "Memory System", heroF3Body: "SRS ทบทวนคำที่ลืมบ่อย",
+    // ── Auth ─────────────────────────────────────────────────────────────
+    loginTitle: "เข้าสู่ระบบ", loginEmail: "อีเมล", loginPassword: "รหัสผ่าน",
+    loginBtn: "เข้าสู่ระบบ", loginNoAccount: "ยังไม่มีบัญชี?", loginGoRegister: "สมัครสมาชิก",
+    registerTitle: "สมัครสมาชิก", registerSubtitle: "เริ่มเรียนอังกฤษและจีน",
+    registerName: "ชื่อเล่น", registerEmail: "อีเมล", registerPassword: "รหัสผ่าน",
+    registerBtn: "สร้างบัญชี", registerHaveAccount: "มีบัญชีแล้ว?", registerGoLogin: "เข้าสู่ระบบ",
+    // ── Onboarding ───────────────────────────────────────────────────────
+    onboardingEyebrow: "เตรียมพร้อมก่อนเรียน",
+    onboardingTitle: "ตั้งค่าเป้าหมายก่อนเริ่มเรียน",
+    onboardingDesc: "เลือกเป้าหมายหลักเพื่อแนะนำ path และระดับเริ่มต้น",
+    onboardingTestBtn: "ทำ placement test", onboardingStart: "เริ่มที่",
+    // ── Placement ────────────────────────────────────────────────────────
+    placementEyebrow: "ทดสอบระดับ", placementTitle: "ทดสอบระดับก่อนเริ่ม",
+    placementDesc: "ครอบคลุม vocabulary, grammar, reading, listening และ speaking แบบสั้น",
+    placementDemoLabel: "Demo score แนะนำเริ่มที่",
+    placementQuestionLabel: "ข้อที่", placementTargetLevel: "ระดับเป้าหมาย",
+    // ── Dashboard ────────────────────────────────────────────────────────
+    dashEyebrow: "แดชบอร์ด", dashToday: "วันนี้เรียนอะไรดี?",
+    dashDesc: "ระบบแนะนำจาก progress, คำที่ต้องทบทวน, skill score และบทเรียนที่ควรเรียนต่อจาก",
+    dashStartMission: "เริ่ม Daily Mission", dashReviewBtn: "ทบทวน", dashWords: "คำ",
+    dashTodayGoal: "เป้าหมายวันนี้", dashGoalCompletion: "Goal completion",
+    dashContinueTitle: "Continue Learning",
+    dashContinueDesc: "เส้นทางที่ระบบแนะนำจาก progress model",
+    dashSeeAll: "ดูทั้งหมด", dashWeeklyPlan: "Weekly Plan",
+    dashSkillScore: "Skill Score",
+    dashSkillDesc: "วัดผล Vocabulary, Speaking, Listening, Reading, Writing และ Grammar",
+    dashDailyMissions: "Daily Missions", dashCoverage: "Category Coverage",
+    dashCoverageDesc: "หมวดที่เชื่อม vocabulary + lesson + progress",
+    dashWordsUnit: "words", dashLessonsUnit: "lessons",
+    // ── Learn ────────────────────────────────────────────────────────────
+    learnEyebrow: "ศูนย์รวมบทเรียน", learnTitle: "ศูนย์รวมการเรียนทุกสกิล",
+    learnDesc: "เลือกบทเรียน กดเริ่มเรียน ทำทีละ step และบันทึก progress ได้จริง",
+    learnStatus: "สถานะ", learnLessons: "บทเรียน", learnCompleted: "เสร็จแล้ว",
+    learnFlow: "Learning Flow", learnTodayTitle: "เรียนต่อวันนี้",
+    learnTodayDesc: "กดเริ่มบทเรียน ทำทีละ step แล้วบันทึก progress ในเครื่อง",
+    learnRefresh: "รีเฟรช", learnContinueLesson: "Continue lesson",
+    learnAllLessons: "บทเรียนทั้งหมด", learnShown: "shown",
+    learnStartBtn: "เริ่มเรียน", learnReviewBtn: "ทบทวนบทเรียน",
+    learnProgressLabel: "ความก้าวหน้า", learnQuickSkills: "ทักษะด่วน",
+    // ── Vocabulary ───────────────────────────────────────────────────────
+    vocabEyebrow: "คลังคำศัพท์", vocabTitle: "Vocabulary 10K",
+    vocabDesc: "ค้นหาคำ ดู progress เปิด flashcards และเตรียมข้อมูลสำหรับ Supabase vocabulary dataset",
+    vocabOpenFlashcards: "เปิด Flashcards",
+    vocabTotal: "ทั้งหมด", vocabEnglish: "อังกฤษ", vocabChinese: "จีน", vocabDueToday: "ถึงเวลาวันนี้",
+    vocabSearchPlaceholder: "ค้นหาคำ...", vocabAllLevels: "ทุกระดับ",
+    // ── Speaking ─────────────────────────────────────────────────────────
+    speakingEyebrow: "ฝึกพูด", speakingTitle: "Speaking Lab",
+    speakingDesc: "Record UI, waveform, transcript scoring mock, pronunciation feedback และ roleplay scenarios",
+    speakingRecord: "บันทึกเสียง", speakingRetry: "ลองอีกครั้ง", speakingSave: "บันทึก progress",
+    speakingTranscript: "Transcript", speakingPronScore: "คะแนน Pronunciation",
+    speakingFluency: "Fluency", speakingConfidence: "Confidence",
+    speakingFeedback: "Feedback AI", speakingScenarios: "Roleplay Scenarios",
+    speakingStartRoleplay: "เริ่ม Roleplay", speakingTarget: "เป้าหมาย",
+    // ── Listening ────────────────────────────────────────────────────────
+    listeningEyebrow: "ฝึกฟัง", listeningTitle: "Listening Lab",
+    listeningDesc: "Audio player mock, transcript, speed control, dictation และ quiz model",
+    listeningPlay: "เล่น", listeningReplay: "เล่นซ้ำ",
+    listeningTranscript: "Transcript", listeningTranslation: "คำแปล",
+    listeningDictation: "Dictation", listeningDictationPlaceholder: "พิมพ์สิ่งที่ได้ยิน...",
+    listeningCheck: "ตรวจคำตอบ", listeningOtherItems: "บทฟังอื่นๆ",
+    listeningQuestions: "คำถาม",
+    // ── Reading ──────────────────────────────────────────────────────────
+    readingEyebrow: "ฝึกอ่าน", readingTitle: "Reading Lab",
+    readingDesc: "Level-based passages, bilingual sentences, vocabulary highlights, summary และ quiz model",
+    readingTranslation: "คำแปล", readingQuiz: "ทำแบบทดสอบ",
+    readingSaveWords: "บันทึกคำศัพท์", readingAiSummary: "AI สรุป",
+    readingOtherPassages: "บทอ่านอื่นๆ", readingQuestions: "คำถาม",
+    // ── Writing ──────────────────────────────────────────────────────────
+    writingEyebrow: "ฝึกเขียน", writingTitle: "Writing Lab",
+    writingDesc: "ฝึกเขียนพร้อม AI ตรวจแกรมม่า, ตัวอย่างคำตอบ, rubric คะแนน",
+    writingPlaceholder: "พิมพ์คำตอบที่นี่...", writingAiCorrect: "AI ตรวจ",
+    writingShowSample: "ดูตัวอย่าง", writingSaveDraft: "บันทึกร่าง",
+    writingScorePreview: "Score preview", writingOtherPrompts: "หัวข้ออื่นๆ",
+    // ── Grammar ──────────────────────────────────────────────────────────
+    grammarEyebrow: "ไวยากรณ์", grammarTitle: "Grammar in Real Life",
+    grammarDesc: "หลักไวยากรณ์เชื่อมสถานการณ์ชีวิตจริง, mini quiz, speaking และ writing practice",
+    grammarPattern: "Pattern", grammarMiniQuiz: "Mini quiz",
+    grammarPractice: "ฝึก", grammarSpeakingLabel: "Speaking", grammarWritingLabel: "Writing",
+    grammarOtherTopics: "หัวข้ออื่นๆ",
+    // ── AI Tutor ─────────────────────────────────────────────────────────
+    aiEyebrow: "AI Tutor", aiTitle: "AI Tutor",
+    aiDesc: "คุยกับ AI เพื่อฝึกภาษา ถามคำถาม และรับ feedback",
+    aiPlaceholder: "พิมพ์ข้อความ...", aiSend: "ส่ง",
+    aiQuickPrompts: "Quick prompts", aiMode: "โหมด",
+    // ── Review ───────────────────────────────────────────────────────────
+    reviewEyebrow: "ทบทวน", reviewTitle: "Spaced Repetition & Flashcards",
+    reviewDesc: "Daily review queue, easy/good/hard/again, favorite decks และ next review preview",
+    reviewDueToday: "ถึงเวลาวันนี้", reviewMastered: "จำได้แล้ว",
+    reviewFavorites: "รายการโปรด", reviewQueue: "คิว",
+    reviewFront: "หน้าการ์ด", reviewShowAnswer: "ดูคำตอบ",
+    reviewEasy: "ง่าย", reviewGood: "ดี", reviewHard: "ยาก", reviewAgain: "ลองอีก",
+    reviewFavoriteDecks: "Flashcard Decks",
+    // ── Progress ─────────────────────────────────────────────────────────
+    progressEyebrow: "ความก้าวหน้า", progressTitle: "วัดผลการเรียนทั้งหมด",
+    progressDesc: "XP, streak, badges, heatmap, weak points และ daily goal",
+    progressXP: "XP", progressStreak: "Streak",
+    progressRemembered: "จำได้", progressReviewToday: "ทบทวนวันนี้",
+    progressHeatmap: "Learning heatmap", progressAchievements: "ความสำเร็จ",
+    progressMistakes: "ข้อผิดพลาดล่าสุด",
+    progressUnlocked: "ปลดล็อคแล้ว", progressLocked: "ยังไม่ปลดล็อค",
+    // ── Profile ──────────────────────────────────────────────────────────
+    profileEyebrow: "โปรไฟล์", profileTitle: "โปรไฟล์ผู้เรียน",
+    profileDesc: "เป้าหมาย ระดับภาษา streak และ badges",
+    profileEnglish: "อังกฤษ", profileChinese: "จีน",
+    profileGoal: "เป้าหมาย", profileStreak: "Streak",
+    profileMin: "นาที", profileDays: "วัน",
+    // ── Settings ─────────────────────────────────────────────────────────
+    settingsEyebrow: "ตั้งค่า", settingsTitle: "ตั้งค่าการเรียน",
+    settingsDesc: "ภาษาเป้าหมาย theme, daily goal, reminder และ AI preferences",
+    settingsThemeNote: "Dark/Light mode อยู่ที่ปุ่มมุมขวาบนของ Topbar",
+    settingsLangNote: "เปลี่ยนภาษา UI ได้จากปุ่ม 🇹🇭 TH / 🇬🇧 EN ใน Topbar",
+    // ── Paths ────────────────────────────────────────────────────────────
+    pathsEyebrow: "เส้นทางเรียน", pathsTitle: "เส้นทางเรียนหลัก",
+    pathsDesc: "เลือกเป้าหมายเรียนตามชีวิตจริง: Daily Life, Travel, Work, School, Conversation, Vocabulary 10K, Grammar และ AI Roleplay",
+    pathsAvailableNow: "เปิดเรียนได้ตอนนี้", pathsEnglish: "อังกฤษ", pathsChinese: "จีน",
+    pathsAvgProgress: "avg progress", pathsFilterLevel: "กรองตามระดับ",
+    pathsFilterLang: "กรองตามภาษา", pathsAllPaths: "เส้นทางทั้งหมด",
+    pathsLockedNote: "ต้องผ่านระดับก่อน", pathsSummary: "สรุปเส้นทาง",
+    // ── Common ───────────────────────────────────────────────────────────
+    loading: "กำลังโหลด...", error: "เกิดข้อผิดพลาด กรุณาลองใหม่",
+    days: "วัน", words: "คำ", lessons: "บทเรียน",
+    score: "คะแนน", level: "ระดับ",
+    start: "เริ่มเรียน", continueLabel: "เรียนต่อ", completed: "เสร็จแล้ว",
+    refresh: "รีเฟรช", search: "ค้นหา",
+    login: "เข้าสู่ระบบ", logout: "ออกจากระบบ", register: "สมัครสมาชิก",
+    todayGoal: "เป้าหมายวันนี้", streak: "streak วัน", xp: "XP",
     startPlacement: "เริ่มวัดระดับ",
-    // Auth
-    login: "เข้าสู่ระบบ",
-    logout: "ออกจากระบบ",
-    register: "สมัครสมาชิก",
   },
   en: {
-    // Nav
-    home: "Home",
-    learn: "Learn",
-    vocabulary: "Vocabulary",
-    speaking: "Speaking",
-    listening: "Listening",
-    reading: "Reading",
-    writing: "Writing",
-    aiTutor: "AI Tutor",
-    review: "Review",
-    progress: "Progress",
-    profile: "Profile",
-    settings: "Settings",
-    // Common UI
-    start: "Start lesson",
-    continue: "Continue",
-    completed: "Completed",
-    loading: "Loading...",
-    error: "Something went wrong",
-    refresh: "Refresh",
-    search: "Search vocabulary, lessons, grammar or ask AI...",
-    lessons: "Lessons",
-    words: "Words",
-    score: "Score",
-    level: "Level",
-    // Dashboard
-    todayGoal: "Today's goal",
-    streak: "day streak",
-    xp: "XP",
-    // Placement
+    appSubtitle: "AI Language Lab",
+    searchPlaceholder: "Search vocabulary, lessons, grammar or ask AI...",
+    navHome: "Home", navLearn: "Learn", navVocabulary: "Vocabulary",
+    navSpeaking: "Speaking", navListening: "Listening", navReading: "Reading",
+    navWriting: "Writing", navAiTutor: "AI Tutor", navReview: "Review",
+    navProgress: "Progress", navProfile: "Profile", navSettings: "Settings",
+    mobileHome: "Home", mobileWords: "Words", mobileSpeak: "Speak",
+    mobileReview: "Review", mobileTutor: "Tutor",
+    landingBadge: "English + Mandarin Chinese · A1-C1 · For Thai speakers",
+    landingHeadline: "Learn languages you can actually use with",
+    landingDesc: "Practice listening, speaking, reading, writing, vocabulary, grammar, and converse with AI Tutor through real-life scenarios like restaurants, travel, work, hospital, and emergencies.",
+    landingCtaStart: "Start Learning", landingCtaPlacement: "Take Placement Test",
+    landingCategoriesBadge: "Real-life categories",
+    landingCategoriesTitle: "Daily life categories you'll actually use",
+    heroMissionLabel: "Today's Mission", heroMissionTitle: "Restaurant Roleplay",
+    heroF1Title: "Vocabulary 10K", heroF1Body: "English/Chinese words with Thai pronunciation",
+    heroF2Title: "Speaking Score", heroF2Body: "AI checks pronunciation + fluency",
+    heroF3Title: "Memory System", heroF3Body: "SRS reviews words you tend to forget",
+    loginTitle: "Log in", loginEmail: "Email", loginPassword: "Password",
+    loginBtn: "Log in", loginNoAccount: "No account yet?", loginGoRegister: "Sign up",
+    registerTitle: "Create account", registerSubtitle: "Start learning English & Chinese",
+    registerName: "Nickname", registerEmail: "Email", registerPassword: "Password",
+    registerBtn: "Create account", registerHaveAccount: "Already have an account?", registerGoLogin: "Log in",
+    onboardingEyebrow: "Get started",
+    onboardingTitle: "Set your learning goals",
+    onboardingDesc: "Choose your main goal to get a recommended path and starting level.",
+    onboardingTestBtn: "Take placement test", onboardingStart: "Start at",
+    placementEyebrow: "Level Test", placementTitle: "Language placement test",
+    placementDesc: "Covers vocabulary, grammar, reading, listening and speaking.",
+    placementDemoLabel: "Demo score — recommended level",
+    placementQuestionLabel: "Question", placementTargetLevel: "Target level",
+    dashEyebrow: "Dashboard", dashToday: "What should I learn today?",
+    dashDesc: "AI recommends based on your progress, review queue, skill scores and next lesson from",
+    dashStartMission: "Start Daily Mission", dashReviewBtn: "Review", dashWords: "words",
+    dashTodayGoal: "Today's Goal", dashGoalCompletion: "Goal completion",
+    dashContinueTitle: "Continue Learning",
+    dashContinueDesc: "Paths recommended by your progress model",
+    dashSeeAll: "See all", dashWeeklyPlan: "Weekly Plan",
+    dashSkillScore: "Skill Score",
+    dashSkillDesc: "Measures Vocabulary, Speaking, Listening, Reading, Writing and Grammar",
+    dashDailyMissions: "Daily Missions", dashCoverage: "Category Coverage",
+    dashCoverageDesc: "Categories linked to vocabulary + lesson + progress",
+    dashWordsUnit: "words", dashLessonsUnit: "lessons",
+    learnEyebrow: "Learning Hub", learnTitle: "All Skills Learning Hub",
+    learnDesc: "Choose a lesson, start step-by-step, and save your progress.",
+    learnStatus: "Status", learnLessons: "Lessons", learnCompleted: "Completed",
+    learnFlow: "Learning Flow", learnTodayTitle: "Continue today",
+    learnTodayDesc: "Start a lesson, complete each step, and save progress locally.",
+    learnRefresh: "Refresh", learnContinueLesson: "Continue lesson",
+    learnAllLessons: "All lessons", learnShown: "shown",
+    learnStartBtn: "Start lesson", learnReviewBtn: "Review lesson",
+    learnProgressLabel: "Progress", learnQuickSkills: "Quick skills",
+    vocabEyebrow: "Vocabulary", vocabTitle: "Vocabulary 10K",
+    vocabDesc: "Search words, review progress, open flashcards and prepare for a large Supabase vocabulary dataset.",
+    vocabOpenFlashcards: "Open Flashcards",
+    vocabTotal: "Total", vocabEnglish: "English", vocabChinese: "Chinese", vocabDueToday: "Due today",
+    vocabSearchPlaceholder: "Search words...", vocabAllLevels: "All levels",
+    speakingEyebrow: "Speaking", speakingTitle: "Speaking Lab",
+    speakingDesc: "Record UI, waveform, transcript scoring mock, pronunciation feedback and real roleplay scenarios.",
+    speakingRecord: "Record", speakingRetry: "Retry", speakingSave: "Save progress",
+    speakingTranscript: "Transcript", speakingPronScore: "Pronunciation Score",
+    speakingFluency: "Fluency", speakingConfidence: "Confidence",
+    speakingFeedback: "AI Feedback", speakingScenarios: "Roleplay Scenarios",
+    speakingStartRoleplay: "Start Roleplay", speakingTarget: "Target",
+    listeningEyebrow: "Listening", listeningTitle: "Listening Lab",
+    listeningDesc: "Audio player mock, transcript, speed control, dictation and quiz model.",
+    listeningPlay: "Play", listeningReplay: "Replay",
+    listeningTranscript: "Transcript", listeningTranslation: "Translation",
+    listeningDictation: "Dictation", listeningDictationPlaceholder: "Type what you hear...",
+    listeningCheck: "Check answer", listeningOtherItems: "Other listening items",
+    listeningQuestions: "Questions",
+    readingEyebrow: "Reading", readingTitle: "Reading Lab",
+    readingDesc: "Level-based passages, bilingual sentences, vocabulary highlights, summary and quiz model.",
+    readingTranslation: "Translation", readingQuiz: "Take quiz",
+    readingSaveWords: "Save words", readingAiSummary: "AI summary",
+    readingOtherPassages: "Other passages", readingQuestions: "Questions",
+    writingEyebrow: "Writing", writingTitle: "Writing Lab",
+    writingDesc: "Writing practice with AI correction, sample answer, and score rubric.",
+    writingPlaceholder: "Type your answer here...", writingAiCorrect: "AI correction",
+    writingShowSample: "Show sample", writingSaveDraft: "Save draft",
+    writingScorePreview: "Score preview", writingOtherPrompts: "Other prompts",
+    grammarEyebrow: "Grammar", grammarTitle: "Grammar in Real Life",
+    grammarDesc: "Grammar lessons connected to daily situations, mini quiz, speaking and writing practice.",
+    grammarPattern: "Pattern", grammarMiniQuiz: "Mini quiz",
+    grammarPractice: "Practice", grammarSpeakingLabel: "Speaking", grammarWritingLabel: "Writing",
+    grammarOtherTopics: "Other topics",
+    aiEyebrow: "AI Tutor", aiTitle: "AI Tutor",
+    aiDesc: "Chat with AI to practice, ask questions, and get feedback.",
+    aiPlaceholder: "Type a message...", aiSend: "Send",
+    aiQuickPrompts: "Quick prompts", aiMode: "Mode",
+    reviewEyebrow: "Review", reviewTitle: "Spaced Repetition & Flashcards",
+    reviewDesc: "Daily review queue, easy/good/hard/again actions, favorite decks and next review preview.",
+    reviewDueToday: "Due today", reviewMastered: "Mastered",
+    reviewFavorites: "Favorites", reviewQueue: "Queue",
+    reviewFront: "Flashcard front", reviewShowAnswer: "Show answer",
+    reviewEasy: "Easy", reviewGood: "Good", reviewHard: "Hard", reviewAgain: "Again",
+    reviewFavoriteDecks: "Flashcard Decks",
+    progressEyebrow: "Progress", progressTitle: "All Learning Progress",
+    progressDesc: "XP, streak, badges, heatmap, weak points and daily goal.",
+    progressXP: "XP", progressStreak: "Streak",
+    progressRemembered: "Remembered", progressReviewToday: "Review today",
+    progressHeatmap: "Learning heatmap", progressAchievements: "Achievements",
+    progressMistakes: "Recent mistakes",
+    progressUnlocked: "unlocked", progressLocked: "locked",
+    profileEyebrow: "Profile", profileTitle: "Learner profile",
+    profileDesc: "Goal, levels, streak and badges.",
+    profileEnglish: "English", profileChinese: "Chinese",
+    profileGoal: "Goal", profileStreak: "Streak",
+    profileMin: "min", profileDays: "days",
+    settingsEyebrow: "Settings", settingsTitle: "Learning settings",
+    settingsDesc: "Target language, theme, daily goal, reminders and AI preferences.",
+    settingsThemeNote: "Dark/Light mode toggle is in the top-right Topbar button.",
+    settingsLangNote: "Switch UI language using the 🇹🇭 TH / 🇬🇧 EN button in the Topbar.",
+    pathsEyebrow: "Learning Paths", pathsTitle: "Main Learning Paths",
+    pathsDesc: "Choose a goal-based path: Daily Life, Travel, Work, School, Conversation, Vocabulary 10K, Grammar and AI Roleplay.",
+    pathsAvailableNow: "Available now", pathsEnglish: "English", pathsChinese: "Chinese",
+    pathsAvgProgress: "avg progress", pathsFilterLevel: "Filter by level",
+    pathsFilterLang: "Filter by language", pathsAllPaths: "All paths",
+    pathsLockedNote: "Complete previous level first", pathsSummary: "Path summary",
+    loading: "Loading...", error: "Something went wrong. Please try again.",
+    days: "days", words: "words", lessons: "lessons",
+    score: "Score", level: "Level",
+    start: "Start lesson", continueLabel: "Continue", completed: "Completed",
+    refresh: "Refresh", search: "Search",
+    login: "Log in", logout: "Log out", register: "Sign up",
+    todayGoal: "Today's goal", streak: "day streak", xp: "XP",
     startPlacement: "Take placement test",
-    // Auth
-    login: "Log in",
-    logout: "Log out",
-    register: "Sign up",
   },
 } as const;
 
 export type TranslationKey = keyof typeof translations.th;
 
-// ─── Context ──────────────────────────────────────────────────────────────────
-type UiLanguageContextValue = {
-  lang: UiLang;
-  setLang: (lang: UiLang) => void;
-  toggle: () => void;
-  t: (key: TranslationKey) => string;
-};
+type Ctx = { lang: UiLang; setLang: (l: UiLang) => void; toggle: () => void; t: (k: TranslationKey) => string };
+const UiLanguageContext = createContext<Ctx | null>(null);
 
-const UiLanguageContext = createContext<UiLanguageContextValue | null>(null);
-
-// ─── Provider ─────────────────────────────────────────────────────────────────
 export function UiLanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<UiLang>("th");
-
-  // Hydrate from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === "th" || saved === "en") setLangState(saved);
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s === "th" || s === "en") setLangState(s);
   }, []);
-
-  const setLang = useCallback((next: UiLang) => {
-    setLangState(next);
-    localStorage.setItem(STORAGE_KEY, next);
-  }, []);
-
-  const toggle = useCallback(() => {
-    setLang(lang === "th" ? "en" : "th");
-  }, [lang, setLang]);
-
-  const t = useCallback(
-    (key: TranslationKey): string => translations[lang][key],
-    [lang]
-  );
-
-  return (
-    <UiLanguageContext.Provider value={{ lang, setLang, toggle, t }}>
-      {children}
-    </UiLanguageContext.Provider>
-  );
+  const setLang = useCallback((l: UiLang) => { setLangState(l); localStorage.setItem(STORAGE_KEY, l); }, []);
+  const toggle = useCallback(() => setLang(lang === "th" ? "en" : "th"), [lang, setLang]);
+  const t = useCallback((k: TranslationKey): string => translations[lang][k], [lang]);
+  return <UiLanguageContext.Provider value={{ lang, setLang, toggle, t }}>{children}</UiLanguageContext.Provider>;
 }
 
-// ─── Hook ─────────────────────────────────────────────────────────────────────
 export function useUiLanguage() {
   const ctx = useContext(UiLanguageContext);
   if (!ctx) throw new Error("useUiLanguage must be used inside UiLanguageProvider");

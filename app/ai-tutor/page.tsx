@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { aiPromptTemplates, aiTutorMessages, aiTutorQuickPrompts } from "@/lib/data/phase7-grammar-ai";
+import { useUiLanguage } from "@/lib/ui-language";
 
 type ChatMessage = {
   role: "assistant" | "user";
@@ -40,6 +41,7 @@ export default function AiTutorPage() {
   const [input, setInput] = useState("");
   const [mode, setMode] = useState("ready");
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useUiLanguage();
 
   async function sendMessage(messageText = input) {
     const message = messageText.trim();
@@ -70,7 +72,7 @@ export default function AiTutorPage() {
 
   return (
     <AppShell>
-      <PageHeader eyebrow="Phase 7 AI Tutor" title="AI Tutor" description="Chat with Groq/OpenAI-compatible AI, use quick prompts, and see the provider mode after each reply." />
+      <PageHeader eyebrow={t("aiEyebrow")} title={t("aiTitle")} description={t("aiDesc")} />
       <div className="grid gap-6 xl:grid-cols-[1fr_0.8fr]">
         <Card className="p-5">
           <div className="mb-4 flex items-center justify-between gap-3">
@@ -90,14 +92,14 @@ export default function AiTutorPage() {
           </div>
 
           <form className="mt-5 flex gap-3" onSubmit={(event) => { event.preventDefault(); void sendMessage(); }}>
-            <Input value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask AI Tutor..." />
+            <Input value={input} onChange={(event) => setInput(event.target.value)} placeholder={t("aiPlaceholder")} />
             <Button type="submit" size="icon" disabled={isLoading || !input.trim()}><Send className="size-4" /></Button>
           </form>
         </Card>
 
         <div className="space-y-4">
           <Card className="p-5">
-            <div className="flex items-center gap-2"><Sparkles className="size-5 text-cyan-300" /><h3 className="text-xl font-black">Quick prompts</h3></div>
+            <div className="flex items-center gap-2"><Sparkles className="size-5 text-cyan-300" /><h3 className="text-xl font-black">{t("aiQuickPrompts")}</h3></div>
             <div className="mt-4 flex flex-wrap gap-2">
               {aiTutorQuickPrompts.map((prompt) => (
                 <Button key={prompt} type="button" variant="outline" size="sm" onClick={() => void sendMessage(prompt)} disabled={isLoading}>{prompt}</Button>

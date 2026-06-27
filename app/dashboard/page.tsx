@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { ArrowRight, CalendarDays, Flame, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
@@ -12,8 +13,10 @@ import { Progress } from "@/components/ui/progress";
 import { dashboardStats, dailyMissions } from "@/lib/data/dashboard";
 import { learningPaths } from "@/lib/data/learning-paths";
 import { phase3Dashboard } from "@/lib/data/phase3-learning";
+import { useUiLanguage } from "@/lib/ui-language";
 
 export default function DashboardPage() {
+  const { t } = useUiLanguage();
   const recommendedPaths = learningPaths.slice(0, 4);
   const { learnerSnapshot, skillMetrics, weeklyLearningPlan, recommendedLessons, categoryCoverage } = phase3Dashboard;
 
@@ -22,19 +25,19 @@ export default function DashboardPage() {
       <div className="mb-8 grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
         <Card className="relative overflow-hidden p-6">
           <div className="absolute -right-20 -top-20 size-56 rounded-full bg-cyan-400/20 blur-3xl" />
-          <Badge variant="success"><Flame className="size-3" /> Streak {learnerSnapshot.streak} วัน · XP {learnerSnapshot.xp.toLocaleString()}</Badge>
-          <h1 className="mt-4 text-3xl font-black tracking-tight lg:text-5xl">วันนี้เรียนอะไรดี?</h1>
-          <p className="mt-3 max-w-2xl text-muted-foreground">ระบบแนะนำจาก progress, คำที่ต้องทบทวน, skill score และบทเรียนที่ควรเรียนต่อเพื่อขยับจาก {learnerSnapshot.level}</p>
+          <Badge variant="success"><Flame className="size-3" /> Streak {learnerSnapshot.streak} {t("days")} · XP {learnerSnapshot.xp.toLocaleString()}</Badge>
+          <h1 className="mt-4 text-3xl font-black tracking-tight lg:text-5xl">{t("dashToday")}</h1>
+          <p className="mt-3 max-w-2xl text-muted-foreground">{t("dashDesc")} {learnerSnapshot.level}</p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button asChild><Link href="/learn">เริ่ม Daily Mission <ArrowRight className="size-4" /></Link></Button>
-            <Button asChild variant="glass"><Link href="/review">ทบทวน {learnerSnapshot.reviewDue} คำ</Link></Button>
+            <Button asChild><Link href="/learn">{t("dashStartMission")} <ArrowRight className="size-4" /></Link></Button>
+            <Button asChild variant="glass"><Link href="/review">{t("dashReviewBtn")} {learnerSnapshot.reviewDue} {t("dashWords")}</Link></Button>
           </div>
         </Card>
 
         <Card className="p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm text-muted-foreground">Today Goal</p>
+              <p className="text-sm text-muted-foreground">{t("dashTodayGoal")}</p>
               <h2 className="mt-1 text-2xl font-black">{learnerSnapshot.todayGoal}</h2>
             </div>
             <span className="rounded-2xl bg-violet-400/10 p-3 text-violet-300"><Sparkles className="size-5" /></span>
@@ -43,7 +46,7 @@ export default function DashboardPage() {
             {learnerSnapshot.weakPoints.map((point) => <Badge key={point} variant="outline">{point}</Badge>)}
           </div>
           <div className="mt-6">
-            <div className="mb-2 flex justify-between text-sm text-muted-foreground"><span>Goal completion</span><span>68%</span></div>
+            <div className="mb-2 flex justify-between text-sm text-muted-foreground"><span>{t("dashGoalCompletion")}</span><span>68%</span></div>
             <Progress value={68} />
           </div>
         </Card>
@@ -57,10 +60,10 @@ export default function DashboardPage() {
         <div>
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-black">Continue Learning</h2>
-              <p className="text-sm text-muted-foreground">เส้นทางที่ระบบแนะนำจาก Phase 3 progress model</p>
+              <h2 className="text-2xl font-black">{t("dashContinueTitle")}</h2>
+              <p className="text-sm text-muted-foreground">{t("dashContinueDesc")}</p>
             </div>
-            <Button asChild variant="ghost"><Link href="/paths">ดูทั้งหมด</Link></Button>
+            <Button asChild variant="ghost"><Link href="/paths">{t("dashSeeAll")}</Link></Button>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             {recommendedPaths.map((path) => <PathCard key={path.id} path={path} />)}
@@ -71,7 +74,7 @@ export default function DashboardPage() {
           <RecommendedLessonCard lesson={recommendedLessons[0]} />
           <Card className="p-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-black">Weekly Plan</h2>
+              <h2 className="text-2xl font-black">{t("dashWeeklyPlan")}</h2>
               <CalendarDays className="size-5 text-cyan-300" />
             </div>
             <div className="mt-5 grid grid-cols-7 gap-2">
@@ -91,8 +94,8 @@ export default function DashboardPage() {
 
       <section className="mt-8">
         <div className="mb-4">
-          <h2 className="text-2xl font-black">Skill Score</h2>
-          <p className="text-sm text-muted-foreground">วัดผล Vocabulary, Speaking, Listening, Reading, Writing และ Grammar</p>
+          <h2 className="text-2xl font-black">{t("dashSkillScore")}</h2>
+          <p className="text-sm text-muted-foreground">{t("dashSkillDesc")}</p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {skillMetrics.map((metric) => <SkillScoreCard key={metric.skill} metric={metric} />)}
@@ -101,7 +104,7 @@ export default function DashboardPage() {
 
       <section className="mt-8 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <Card className="p-5">
-          <h2 className="text-2xl font-black">Daily Missions</h2>
+          <h2 className="text-2xl font-black">{t("dashDailyMissions")}</h2>
           <div className="mt-4 space-y-3">
             {dailyMissions.map((mission) => (
               <div key={mission.id} className="rounded-3xl border border-border bg-secondary/30 p-4">
@@ -118,14 +121,14 @@ export default function DashboardPage() {
         </Card>
 
         <Card className="p-5">
-          <h2 className="text-2xl font-black">Category Coverage</h2>
-          <p className="mt-2 text-sm text-muted-foreground">หมวดที่เชื่อม vocabulary + lesson + progress</p>
+          <h2 className="text-2xl font-black">{t("dashCoverage")}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{t("dashCoverageDesc")}</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {categoryCoverage.slice(0, 6).map((category) => (
               <div key={category.id} className="rounded-3xl border border-border bg-secondary/30 p-4">
                 <div className="flex items-center justify-between"><span className="font-bold">{category.icon} {category.nameTh}</span><span className="text-sm text-muted-foreground">{category.progress}%</span></div>
                 <Progress value={category.progress} className="mt-3" />
-                <p className="mt-2 text-xs text-muted-foreground">{category.words} words · {category.lessonCount} lessons</p>
+                <p className="mt-2 text-xs text-muted-foreground">{category.words} {t("dashWordsUnit")} · {category.lessonCount} {t("dashLessonsUnit")}</p>
               </div>
             ))}
           </div>

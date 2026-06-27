@@ -1,9 +1,12 @@
+"use client";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { mainNav } from "@/lib/navigation";
+import { useUiLanguage } from "@/lib/ui-language";
 import { cn } from "@/lib/utils";
 
 export function Sidebar({ className }: { className?: string }) {
+  const { t } = useUiLanguage();
   return (
     <aside className={cn("hidden h-dvh w-72 shrink-0 border-r border-border/60 bg-background/40 p-4 backdrop-blur-xl lg:block", className)}>
       <Link href="/dashboard" className="mb-8 flex items-center gap-3 rounded-3xl p-3">
@@ -12,19 +15,18 @@ export function Sidebar({ className }: { className?: string }) {
         </span>
         <span>
           <span className="block text-lg font-black tracking-tight">LinguaQuest</span>
-          <span className="block text-xs text-muted-foreground">AI Language Lab</span>
+          <span className="block text-xs text-muted-foreground">{t("appSubtitle")}</span>
         </span>
       </Link>
-
       <nav className="space-y-1">
-        {mainNav.slice(0, 10).map((item) => (
+        {mainNav.map((item) => (
           <Link
-            key={item.href + item.label}
+            key={item.href}
             href={item.href}
             className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-muted-foreground transition hover:bg-secondary/70 hover:text-foreground"
           >
             <item.icon className="size-4" />
-            {item.label}
+            {t(item.labelKey)}
           </Link>
         ))}
       </nav>
