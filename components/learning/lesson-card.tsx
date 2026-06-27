@@ -56,7 +56,7 @@ export function LessonCard({ lesson }: { lesson: Lesson }) {
           <span>Lesson progress</span>
           <span>{lesson.progress}%</span>
         </div>
-        <Progress value={lesson.progress} />
+        <Progress value={lesson.progress ?? 0} />
       </div>
 
       <Button asChild className="mt-5 w-full" variant={disabled ? "outline" : "default"}>
