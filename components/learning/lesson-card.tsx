@@ -5,14 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
-type LessonStatus = "completed" | "in_progress" | "ready" | "locked";
-
 type Lesson = {
   id: string;
   title: string;
   description?: string;
   level?: string;
-  status: LessonStatus;
+  status: string;          // string from data; narrowed internally via statusMap lookup
   isRecommended?: boolean;
   estimatedMins?: number;
   steps?: unknown[];
@@ -21,14 +19,14 @@ type Lesson = {
 };
 
 const statusMap = {
-  completed: { label: "เรียนแล้ว", icon: CheckCircle2, badge: "success" as const },
-  in_progress: { label: "กำลังเรียน", icon: PlayCircle, badge: "default" as const },
-  ready: { label: "พร้อมเรียน", icon: Sparkles, badge: "outline" as const },
-  locked: { label: "ยังล็อก", icon: Lock, badge: "outline" as const }
+  completed:   { label: "เรียนแล้ว",    icon: CheckCircle2, badge: "success"  as const },
+  in_progress: { label: "กำลังเรียน",   icon: PlayCircle,   badge: "default"  as const },
+  ready:       { label: "พร้อมเรียน",   icon: Sparkles,     badge: "outline"  as const },
+  locked:      { label: "ยังล็อก",      icon: Lock,         badge: "outline"  as const },
 };
 
 export function LessonCard({ lesson }: { lesson: Lesson }) {
-  const status = statusMap[lesson.status] ?? statusMap.ready;
+  const status = statusMap[lesson.status as keyof typeof statusMap] ?? statusMap.ready;
   const Icon = status.icon;
   const disabled = lesson.status === "locked";
 
@@ -44,9 +42,7 @@ export function LessonCard({ lesson }: { lesson: Lesson }) {
           <h3 className="mt-4 text-xl font-black leading-tight">{lesson.title}</h3>
           <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{lesson.description}</p>
         </div>
-        <span className="rounded-2xl bg-cyan-400/10 p-3 text-cyan-300">
-          <Icon className="size-5" />
-        </span>
+        <span className="rounded-2xl bg-cyan-400/10 p-3 text-cyan-300"><Icon className="size-5" /></span>
       </div>
 
       <div className="mt-5 grid gap-3 rounded-3xl border border-border bg-secondary/25 p-4 text-sm text-muted-foreground sm:grid-cols-3">
@@ -64,7 +60,9 @@ export function LessonCard({ lesson }: { lesson: Lesson }) {
       </div>
 
       <Button asChild className="mt-5 w-full" variant={disabled ? "outline" : "default"}>
-        <Link href={disabled ? "#" : `/lessons/${lesson.id}`}>{disabled ? "ปลดล็อกหลังจบบทก่อนหน้า" : "เปิดบทเรียน"}</Link>
+        <Link href={disabled ? "#" : `/lessons/${lesson.id}`}>
+          {disabled ? "ปลดล็อกหลังจบบทก่อนหน้า" : "เปิดบทเรียน"}
+        </Link>
       </Button>
     </Card>
   );
