@@ -7,7 +7,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const rateLimit = checkRateLimit(`ai-tutor-chat:${getClientIp(request)}`, 15, 60_000);
+  const rateLimit = await checkRateLimit(`ai-tutor-chat:${getClientIp(request)}`, 15, 60_000);
   if (!rateLimit.allowed) return rateLimitResponse(rateLimit);
 
   const body = await request.json().catch(() => ({}));

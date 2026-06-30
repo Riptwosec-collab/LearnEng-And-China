@@ -1,16 +1,11 @@
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
 /**
- * Minimal in-memory, sliding-window rate limiter.
+ * Shared rate limiter for production and in-memory fallback for local dev/test.
  *
- * This is intentionally simple: it protects a *single* server instance from
- * obvious abuse/cost overruns on AI + speech endpoints with zero extra
- * infrastructure. It does NOT share state across multiple server instances
- * or serverless invocations.
- *
- * For real multi-instance production deployments (e.g. several Vercel
- * lambdas), replace this with a shared store such as Upstash Redis
- * (`@upstash/ratelimit`) or a database-backed counter so all instances see
- * the same limit. The function signature below is designed so that swap is
- * a one-file change — every call site only depends on `checkRateLimit`.
+ * Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN to share limits across
+ * serverless instances. Without those values, requests are limited per process.
  */
 
 type Bucket = {
@@ -19,8 +14,8 @@ type Bucket = {
 };
 
 const buckets = new Map<string, Bucket>();
+const upstashLimiters = new Map<string, Ratelimit>();
 
-// Periodically forget old buckets so this Map can't grow forever.
 const SWEEP_INTERVAL_MS = 5 * 60 * 1000;
 let lastSweep = Date.now();
 
@@ -39,16 +34,47 @@ export type RateLimitResult = {
   resetAt: number;
 };
 
-/**
- * Check + consume one request from the caller's quota.
- *
- * @param key        Unique identifier for the caller, e.g. `ai-tutor:<ip>` or
- *                    `speech-tts:<userId>`. Always namespace by route so
- *                    different endpoints don't share a budget.
- * @param limit       Max requests allowed within the window.
- * @param windowMs    Window size in milliseconds (default: 1 minute).
- */
-export function checkRateLimit(key: string, limit = 10, windowMs = 60_000): RateLimitResult {
+function getUpstashRedis() {
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) return null;
+  return Redis.fromEnv();
+}
+
+function getUpstashLimiter(limit: number, windowMs: number) {
+  const redis = getUpstashRedis();
+  if (!redis) return null;
+
+  const cacheKey = `${limit}:${windowMs}`;
+  const existing = upstashLimiters.get(cacheKey);
+  if (existing) return existing;
+
+  const windowSeconds = Math.max(1, Math.ceil(windowMs / 1000));
+  const limiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(limit, `${windowSeconds} s`),
+    analytics: true,
+    prefix: "linguaquest:ratelimit"
+  });
+
+  upstashLimiters.set(cacheKey, limiter);
+  return limiter;
+}
+
+export async function checkRateLimit(
+  key: string,
+  limit = 10,
+  windowMs = 60_000
+): Promise<RateLimitResult> {
+  const upstashLimiter = getUpstashLimiter(limit, windowMs);
+  if (upstashLimiter) {
+    const result = await upstashLimiter.limit(key);
+    return {
+      allowed: result.success,
+      limit,
+      remaining: result.remaining,
+      resetAt: result.reset
+    };
+  }
+
   const now = Date.now();
   sweepExpiredBuckets(now);
 
@@ -67,14 +93,12 @@ export function checkRateLimit(key: string, limit = 10, windowMs = 60_000): Rate
   return { allowed: true, limit, remaining: limit - existing.count, resetAt: existing.resetAt };
 }
 
-/** Best-effort client identifier to key the rate limiter by, when there's no authenticated user id available. */
 export function getClientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) return forwarded.split(",")[0].trim();
   return request.headers.get("x-real-ip") ?? "unknown";
 }
 
-/** Standard 429 JSON response, with a Retry-After header set from the bucket's reset time. */
 export function rateLimitResponse(result: RateLimitResult) {
   const retryAfterSeconds = Math.max(1, Math.ceil((result.resetAt - Date.now()) / 1000));
   return Response.json(

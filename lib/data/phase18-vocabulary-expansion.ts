@@ -14,9 +14,50 @@ export type GeneratedVocabularyRow = {
   tags: string[];
 };
 
-const categories = ["home", "shopping", "restaurant", "travel", "work", "school", "health", "banking", "technology", "emergency"];
+const categories = [
+  "home",
+  "shopping",
+  "restaurant",
+  "travel",
+  "work",
+  "school",
+  "health",
+  "banking",
+  "technology",
+  "emergency"
+] as const;
+
 const levels = ["A1", "A2", "B1", "B2", "C1"] as const;
-const englishBases = ["book", "buy", "call", "clean", "confirm", "cook", "describe", "email", "explain", "find", "help", "learn", "meeting", "order", "pay", "plan", "practice", "read", "repair", "reserve", "schedule", "send", "speak", "study", "travel", "write"];
+
+const englishBases = [
+  "book",
+  "buy",
+  "call",
+  "clean",
+  "confirm",
+  "cook",
+  "describe",
+  "email",
+  "explain",
+  "find",
+  "help",
+  "learn",
+  "meeting",
+  "order",
+  "pay",
+  "plan",
+  "practice",
+  "read",
+  "repair",
+  "reserve",
+  "schedule",
+  "send",
+  "speak",
+  "study",
+  "travel",
+  "write"
+] as const;
+
 const chineseBases = [
   ["学习", "xuéxí", "เสวียสี", "เรียน"],
   ["工作", "gōngzuò", "กงจั้ว", "ทำงาน"],
@@ -40,6 +81,10 @@ function levelAt(index: number) {
   return levels[index % levels.length];
 }
 
+function categoryLabel(categorySlug: string) {
+  return categorySlug.replaceAll("-", " ");
+}
+
 export function generateExpandedVocabulary(targetPerLanguage = 500): GeneratedVocabularyRow[] {
   const rows: GeneratedVocabularyRow[] = [];
 
@@ -47,17 +92,19 @@ export function generateExpandedVocabulary(targetPerLanguage = 500): GeneratedVo
     const base = englishBases[i % englishBases.length];
     const categorySlug = categories[i % categories.length];
     const level = levelAt(i);
+    const category = categoryLabel(categorySlug);
+
     rows.push({
       id: `en-expanded-${String(i + 1).padStart(4, "0")}`,
       language: "english",
-      word: `${base} ${categorySlug} ${i + 1}`,
-      thaiMeaning: `คำ/วลีเกี่ยวกับ ${categorySlug} ลำดับ ${i + 1}`,
+      word: `${base} (${category})`,
+      thaiMeaning: `คำ/วลีเกี่ยวกับ ${category} ลำดับ ${i + 1}`,
       cefrLevel: level,
       categorySlug,
       partOfSpeech: i % 3 === 0 ? "phrase" : i % 3 === 1 ? "verb" : "noun",
       thaiPronunciation: base,
-      exampleSentence: `I want to ${base} in a ${categorySlug} situation.`,
-      exampleTranslationTh: `ฉันต้องการใช้คำว่า ${base} ในสถานการณ์ ${categorySlug}`,
+      exampleSentence: `I want to ${base} in a ${category} situation.`,
+      exampleTranslationTh: `ฉันต้องการใช้คำว่า ${base} ในสถานการณ์ ${category}`,
       tags: [categorySlug, level, "expanded"]
     });
   }
@@ -66,14 +113,16 @@ export function generateExpandedVocabulary(targetPerLanguage = 500): GeneratedVo
     const [hanzi, pinyin, thaiPronunciation, thaiMeaning] = chineseBases[i % chineseBases.length];
     const categorySlug = categories[i % categories.length];
     const level = levelAt(i);
+    const category = categoryLabel(categorySlug);
+
     rows.push({
       id: `zh-expanded-${String(i + 1).padStart(4, "0")}`,
       language: "chinese",
-      word: `${hanzi}${i + 1}`,
-      chineseHanzi: `${hanzi}${i + 1}`,
+      word: `${hanzi} (${category})`,
+      chineseHanzi: hanzi,
       pinyin,
       thaiPronunciation,
-      thaiMeaning: `${thaiMeaning} ในหมวด ${categorySlug}`,
+      thaiMeaning: `${thaiMeaning} ในหมวด ${category}`,
       cefrLevel: level,
       categorySlug,
       partOfSpeech: i % 2 === 0 ? "verb" : "phrase",

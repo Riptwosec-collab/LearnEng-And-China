@@ -25,10 +25,11 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm install
+      - run: npm ci
       - run: npm run env:check
       - run: npm run prisma:generate
       - run: npm run content:export
+      - run: npm run content:validate
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run test

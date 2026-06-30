@@ -4,7 +4,7 @@ import { scoreWritingPreview } from "@/lib/data/phase6-reading-writing";
 import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
-  const rateLimit = checkRateLimit(`writing-correct:${getClientIp(request)}`, 10, 60_000);
+  const rateLimit = await checkRateLimit(`writing-correct:${getClientIp(request)}`, 10, 60_000);
   if (!rateLimit.allowed) return rateLimitResponse(rateLimit);
 
   const body = await request.json().catch(() => ({}));

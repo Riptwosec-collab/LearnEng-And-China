@@ -3,7 +3,7 @@ import { aiPromptTemplates } from "@/lib/ai/prompt-templates";
 import { checkRateLimit, getClientIp, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
-  const rateLimit = checkRateLimit(`quiz-generate:${getClientIp(request)}`, 10, 60_000);
+  const rateLimit = await checkRateLimit(`quiz-generate:${getClientIp(request)}`, 10, 60_000);
   if (!rateLimit.allowed) return rateLimitResponse(rateLimit);
 
   const body = await request.json().catch(() => ({}));

@@ -6,27 +6,27 @@ describe("checkRateLimit", () => {
     vi.useRealTimers();
   });
 
-  it("allows requests up to the limit and then blocks", () => {
+  it("allows requests up to the limit and then blocks", async () => {
     const key = `test-key-${Math.random()}`;
     const limit = 3;
 
     for (let i = 0; i < limit; i++) {
-      const result = checkRateLimit(key, limit, 60_000);
+      const result = await checkRateLimit(key, limit, 60_000);
       expect(result.allowed).toBe(true);
     }
 
-    const blocked = checkRateLimit(key, limit, 60_000);
+    const blocked = await checkRateLimit(key, limit, 60_000);
     expect(blocked.allowed).toBe(false);
     expect(blocked.remaining).toBe(0);
   });
 
-  it("tracks separate buckets per key", () => {
+  it("tracks separate buckets per key", async () => {
     const keyA = `key-a-${Math.random()}`;
     const keyB = `key-b-${Math.random()}`;
 
-    checkRateLimit(keyA, 1, 60_000);
-    const blockedA = checkRateLimit(keyA, 1, 60_000);
-    const allowedB = checkRateLimit(keyB, 1, 60_000);
+    await checkRateLimit(keyA, 1, 60_000);
+    const blockedA = await checkRateLimit(keyA, 1, 60_000);
+    const allowedB = await checkRateLimit(keyB, 1, 60_000);
 
     expect(blockedA.allowed).toBe(false);
     expect(allowedB.allowed).toBe(true);
@@ -36,11 +36,11 @@ describe("checkRateLimit", () => {
     const key = `key-reset-${Math.random()}`;
     const windowMs = 50;
 
-    checkRateLimit(key, 1, windowMs);
-    expect(checkRateLimit(key, 1, windowMs).allowed).toBe(false);
+    await checkRateLimit(key, 1, windowMs);
+    expect((await checkRateLimit(key, 1, windowMs)).allowed).toBe(false);
 
     await new Promise((resolve) => setTimeout(resolve, windowMs + 10));
 
-    expect(checkRateLimit(key, 1, windowMs).allowed).toBe(true);
+    expect((await checkRateLimit(key, 1, windowMs)).allowed).toBe(true);
   });
 });

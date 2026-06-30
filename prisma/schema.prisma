@@ -3,9 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
 enum TargetLanguage {
@@ -82,6 +80,11 @@ enum LessonProgressStatus {
   completed
 }
 
+enum UserRole {
+  learner
+  admin
+}
+
 model User {
   id         String      @id @default(cuid())
   authUserId String?     @unique
@@ -105,6 +108,7 @@ model UserProfile {
   dailyGoalMinutes    Int       @default(15)
   xp                  Int       @default(0)
   level               Int       @default(1)
+  role                UserRole  @default(learner)
   streakCount         Int       @default(0)
   timezone            String    @default("Asia/Bangkok")
   createdAt           DateTime  @default(now())

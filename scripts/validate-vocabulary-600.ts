@@ -35,7 +35,7 @@ function validateRow(row: (typeof vocabularySeeds)[number], index: number) {
   if (row.language === "chinese") {
     assert(Boolean(row.chineseHanzi), `Chinese row missing Hanzi: ${row.id}`);
     assert(Boolean(row.pinyin),       `Chinese row missing pinyin: ${row.id}`);
-    // hskLevel is `number | undefined` — guard before Set.has() (fixes TS2345)
+    // hskLevel is `number | undefined`; guard before Set.has() (fixes TS2345).
     assert(
       row.hskLevel != null && validHsk.has(row.hskLevel),
       `Chinese row has invalid HSK: ${row.id} (got ${String(row.hskLevel)})`,
@@ -65,7 +65,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log("All vocabulary rows valid ✓");
+  console.log("All vocabulary rows valid");
 }
 
 main();

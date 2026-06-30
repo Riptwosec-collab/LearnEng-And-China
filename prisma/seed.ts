@@ -1,7 +1,8 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { getPrisma } from "../lib/db/prisma";
 import { categorySeeds, languageSeeds, learningPathSeeds, vocabularySeeds } from "../lib/data/phase2-dataset";
 
-const prisma = new PrismaClient();
+const prisma = getPrisma();
 
 async function main() {
   for (const item of languageSeeds) {

@@ -8,7 +8,7 @@ function getSpeechProvider() {
 }
 
 export async function POST(request: Request) {
-  const rateLimit = checkRateLimit(`speech-stt:${getClientIp(request)}`, 15, 60_000);
+  const rateLimit = await checkRateLimit(`speech-stt:${getClientIp(request)}`, 15, 60_000);
   if (!rateLimit.allowed) return rateLimitResponse(rateLimit);
 
   const mock = process.env.NEXT_PUBLIC_ENABLE_MOCK_SPEECH === "true";

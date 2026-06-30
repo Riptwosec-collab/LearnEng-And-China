@@ -7,6 +7,7 @@ type EnvRule = {
 const provider = (process.env.AI_PROVIDER ?? "openai").toLowerCase();
 const mockAi = process.env.NEXT_PUBLIC_ENABLE_MOCK_AI !== "false";
 const mockSpeech = process.env.NEXT_PUBLIC_ENABLE_MOCK_SPEECH !== "false";
+const production = process.env.NODE_ENV === "production";
 
 const rules: EnvRule[] = [
   {
@@ -54,6 +55,16 @@ const rules: EnvRule[] = [
     name: "GROQ_API_KEY",
     requiredWhen: () => provider === "groq" && !mockSpeech,
     hint: "Required when AI_PROVIDER=groq and mock speech is disabled."
+  },
+  {
+    name: "UPSTASH_REDIS_REST_URL",
+    requiredWhen: () => production,
+    hint: "Required in production so rate limits are shared across serverless instances."
+  },
+  {
+    name: "UPSTASH_REDIS_REST_TOKEN",
+    requiredWhen: () => production,
+    hint: "Required in production so rate limits are shared across serverless instances."
   }
 ];
 
@@ -66,6 +77,7 @@ console.log("LinguaQuest production environment check");
 console.log(`AI provider: ${provider}`);
 console.log(`Mock AI: ${mockAi ? "on" : "off"}`);
 console.log(`Mock speech: ${mockSpeech ? "on" : "off"}`);
+console.log(`Production mode: ${production ? "yes" : "no"}`);
 
 if (missing.length > 0) {
   console.error("\nMissing required environment values:");

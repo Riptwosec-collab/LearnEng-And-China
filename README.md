@@ -1,10 +1,10 @@
-# LinguaQuest AI
+﻿# LinguaQuest AI
 
 [![QA](https://github.com/Riptwosec-collab/LearnEng-And-China/actions/workflows/qa.yml/badge.svg)](https://github.com/Riptwosec-collab/LearnEng-And-China/actions/workflows/qa.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-339933)](./package.json)
 
-เว็บแอพเรียนภาษาอังกฤษและภาษาจีนกลางสำหรับผู้ใช้ไทย ตั้งแต่ A1-C1 พร้อม Vocabulary, Speaking, Listening, Reading, Writing, Grammar, AI Tutor, Review, Dashboard, Admin CMS, Supabase, AI provider adapter, STT/TTS, QA workflow, Vercel config และ content expansion
+เว็บแอปเรียนภาษาอังกฤษและภาษาจีนกลางสำหรับผู้ใช้ไทย ตั้งแต่ระดับ A1-C1 พร้อม Vocabulary, Speaking, Listening, Reading, Writing, Grammar, AI Tutor, Review, Dashboard, Admin CMS, Supabase, AI provider adapter, STT/TTS, QA workflow, Vercel config และ content expansion
 
 ## Phase Status
 
@@ -30,7 +30,7 @@
 ## Run
 
 ```bash
-npm install
+npm ci
 cp .env.example .env
 npm run dev
 ```
@@ -83,7 +83,7 @@ In production/CI, apply already-committed migrations with:
 npm run prisma:migrate:deploy
 ```
 
-`prisma db push` does not create migration files — it's fine for quick local
+`prisma db push` does not create migration files - it's fine for quick local
 experiments, but production schema changes should go through
 `prisma migrate dev` / `prisma migrate deploy` so they're versioned and
 reversible.
@@ -114,7 +114,7 @@ docs/SUPABASE_PRODUCTION_SETUP.md
 
 All AI and speech endpoints are protected by a basic per-IP rate limiter
 (`lib/rate-limit.ts`) to avoid runaway API costs from abuse. It's in-memory
-and per-instance — for multi-instance production deployments, swap it for a
+and per-instance - for multi-instance production deployments, swap it for a
 shared store (e.g. `@upstash/ratelimit`).
 
 See:

@@ -7,3 +7,7 @@ out
 coverage
 prisma/dev.db
 *.tsbuildinfo
+files/
+files (1)/
+*.zip
+*.patch
